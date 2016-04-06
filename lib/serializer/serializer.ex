@@ -1,22 +1,24 @@
-defmodule Channels.Client.Socket.Serializer do
+defmodule Phoenix.Channels.GenSocketClient.Serializer do
   @moduledoc """
-  Describes the serializer interface used in `Channels.Client.Socket` to encode/decode messages.
+  Describes the serializer interface used in `Phoenix.Channels.GenSocketClient` to encode/decode messages.
   """
 
+  alias Phoenix.Channels.GenSocketClient
+
   @doc "Invoked to decode the raw message."
-  @callback decode_message(Socket.encoded_message) :: Socket.message
+  @callback decode_message(GenSocketClient.encoded_message) :: GenSocketClient.message
 
   @doc "Invoked to encode a socket message."
-  @callback encode_message(Socket.message) :: {:text | :binary, Socket.encoded_message}
+  @callback encode_message(GenSocketClient.message) :: {:text | :binary, GenSocketClient.encoded_message}
 end
 
-defmodule Channels.Client.Socket.Serializer.Json do
+defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
   @moduledoc "Json serializer for the socket client."
-  @behaviour Channels.Client.Socket.Serializer
+  @behaviour Phoenix.Channels.GenSocketClient.Serializer
 
 
   # -------------------------------------------------------------------
-  # Channels.Client.Socket.Serializer callbacks
+  # Phoenix.Channels.GenSocketClient.Serializer callbacks
   # -------------------------------------------------------------------
 
   @doc false
@@ -33,13 +35,13 @@ defmodule Channels.Client.Socket.Serializer.Json do
   end
 end
 
-defmodule Channels.Client.Socket.Serializer.GzipJson do
+defmodule Phoenix.Channels.GenSocketClient.Serializer.GzipJson do
   @moduledoc "Gzip+Json serializer for the socket client."
-  @behaviour Channels.Client.Socket.Serializer
+  @behaviour Phoenix.Channels.GenSocketClient.Serializer
 
 
   # -------------------------------------------------------------------
-  # Channels.Client.Socket.Serializer callbacks
+  # Phoenix.Channels.GenSocketClient.Serializer callbacks
   # -------------------------------------------------------------------
 
   @doc false

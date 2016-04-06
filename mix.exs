@@ -1,4 +1,4 @@
-defmodule PhoenixGenSocketClient.Mixfile do
+defmodule Phoenix.GenSocketClient.Mixfile do
   use Mix.Project
 
   def project do

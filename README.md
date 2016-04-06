@@ -1,4 +1,4 @@
-# PhoenixGenSocketClient
+# PhoenixGenSocketClientClient
 
 **TODO: Add description**
 

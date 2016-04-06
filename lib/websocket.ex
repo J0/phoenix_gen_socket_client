@@ -1,9 +1,9 @@
-defmodule Channels.Client.WebsocketTransport do
+defmodule Phoenix.Channels.GenSocketClient.WebSocketClient do
   @moduledoc """
-  Websocket adapter for `Channels.Client.Socket`.
+  Websocket adapter for `Phoenix.Channels.GenSocketClient`.
 
   This modules implements a plain websocket client which runs in a separate
-  process. The module exposes the interface required by `Channels.Client.Socket`
+  process. The module exposes the interface required by `Phoenix.Channels.GenSocketClient`
   and notifies the socket process on transport event, such as message arrivals,
   or disconnects.
   """
@@ -11,7 +11,7 @@ defmodule Channels.Client.WebsocketTransport do
 
   require Logger
   require Record
-  alias Channels.Client.Socket
+  alias Phoenix.Channels.GenSocketClient
 
 
   # -------------------------------------------------------------------
@@ -43,13 +43,13 @@ defmodule Channels.Client.WebsocketTransport do
 
   @doc false
   def onconnect(_req, state) do
-    Socket.notify_connected(state.socket)
+    GenSocketClient.notify_connected(state.socket)
     {:ok, state}
   end
 
   @doc false
   def websocket_handle({type, message}, _req, state) when type in [:text, :binary] do
-    Socket.notify_message(state.socket, message)
+    GenSocketClient.notify_message(state.socket, message)
     {:ok, state}
   end
   def websocket_handle(other_msg, _req, state) do
@@ -65,7 +65,7 @@ defmodule Channels.Client.WebsocketTransport do
 
   @doc false
   def ondisconnect(reason, state) do
-    Socket.notify_disconnected(state.socket, reason)
+    GenSocketClient.notify_disconnected(state.socket, reason)
     {:close, :normal, state}
   end
 

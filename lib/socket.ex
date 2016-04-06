@@ -1,4 +1,4 @@
-defmodule Channels.Client.Socket do
+defmodule Phoenix.Channels.GenSocketClient do
   @moduledoc """
   Communication with a Phoenix Channels server.
 
@@ -68,7 +68,7 @@ defmodule Channels.Client.Socket do
   you can simply return `{:stop, reason, state}` from any of the callback.
   """
   use GenServer
-  alias Channels.Client.WebsocketTransport
+  alias Phoenix.Channels.GenSocketClient.WebSocketClient
 
   @type socket_opts :: [{:serializer, module}]
   @type callback_state :: any
@@ -155,7 +155,7 @@ defmodule Channels.Client.Socket do
         {:error, :already_joined}
       true ->
         frame = transport.serializer.encode_message(%{topic: topic, event: event, payload: payload, ref: ref})
-        WebsocketTransport.push(transport.transport_pid, frame)
+        WebSocketClient.push(transport.transport_pid, frame)
         {:ok, ref}
     end
   end
@@ -191,7 +191,7 @@ defmodule Channels.Client.Socket do
       {:ok, url, callback_state} ->
         {:ok, %{
           url: url,
-          serializer: Keyword.get(socket_opts, :serializer, Channels.Client.Socket.Serializer.Json),
+          serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
           callback: callback,
           callback_state: callback_state,
           transport_pid: nil,
@@ -261,7 +261,7 @@ defmodule Channels.Client.Socket do
   # -------------------------------------------------------------------
 
   defp connect(%{transport_pid: nil} = state) do
-    {:ok, transport_pid} = WebsocketTransport.start_link(state.url)
+    {:ok, transport_pid} = WebSocketClient.start_link(state.url)
     transport_mref = Process.monitor(transport_pid)
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
