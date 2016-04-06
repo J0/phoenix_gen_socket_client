@@ -76,7 +76,8 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   end
 
   @doc "Pushes a message to the topic."
-  @spec push(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload, GenServer.timeout) ::
+  @spec push(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload,
+      GenServer.timeout) ::
     {:ok, GenSocketClient.ref} |
     {:error, any}
   def push(socket, topic, event, payload \\ %{}, timeout \\ 5000) do
@@ -90,7 +91,8 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   end
 
   @doc "Pushes a message to the topic and awaits the direct response from the server."
-  @spec push_sync(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload, GenServer.timeout) ::
+  @spec push_sync(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload,
+      GenServer.timeout) ::
     {:ok, GenSocketClient.payload} |
     {:error, any}
   def push_sync(socket, topic, event, payload \\ %{}, timeout \\ 5000) do

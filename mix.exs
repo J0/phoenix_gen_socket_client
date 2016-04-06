@@ -19,6 +19,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
 
   defp deps do
     [
+      {:credo, "~> 0.3.0", only: [:dev, :test]},
       {:dialyze, "~> 0.2.1", only: :dev},
       {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0", only: [:dev, :test]},
       {:poison, "~> 1.5", only: :test},
