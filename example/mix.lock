@@ -1,0 +1,8 @@
+%{"cowboy": {:hex, :cowboy, "1.0.4"},
+  "cowlib": {:hex, :cowlib, "1.0.2"},
+  "gettext": {:hex, :gettext, "0.10.0"},
+  "phoenix": {:hex, :phoenix, "1.1.4"},
+  "plug": {:hex, :plug, "1.1.3"},
+  "poison": {:hex, :poison, "2.1.0"},
+  "ranch": {:hex, :ranch, "1.2.1"},
+  "websocket_client": {:git, "https://github.com/sanmiguel/websocket_client.git", "16cd139a71d99813ec0c0cd1d8cb92dbde93d9c7", [tag: "1.1.0"]}}
