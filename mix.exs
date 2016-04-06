@@ -9,7 +9,11 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      deps: deps
+      deps: deps,
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -21,7 +25,8 @@ defmodule Phoenix.GenSocketClient.Mixfile do
     [
       {:credo, "~> 0.3.0", only: [:dev, :test]},
       {:dialyze, "~> 0.2.1", only: :dev},
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0", only: [:dev, :test]},
+      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0",
+        only: [:dev, :test, :docs]},
       {:poison, "~> 1.5", only: :test},
       {:phoenix, "~> 1.1.4", only: :test},
       {:cowboy, "~> 1.0", only: :test},
