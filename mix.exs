@@ -14,12 +14,13 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   end
 
   def application do
-    [applications: [:logger]]
+    [applications: applications(Mix.env)]
   end
 
   defp deps do
     [
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0", only: :test},
+      {:dialyze, "~> 0.2.1", only: :dev},
+      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0", only: [:dev, :test]},
       {:poison, "~> 1.5", only: :test},
       {:phoenix, "~> 1.1.4", only: :test},
       {:cowboy, "~> 1.0", only: :test},
@@ -31,4 +32,8 @@ defmodule Phoenix.GenSocketClient.Mixfile do
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp applications(:test), do: [:logger, :websocket_client, :gproc, :cowboy, :phoenix]
+  defp applications(:dev), do: [:logger, :websocket_client]
+  defp applications(_), do: [:logger]
 end
