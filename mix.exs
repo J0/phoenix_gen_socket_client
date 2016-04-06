@@ -20,11 +20,12 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   defp deps do
     [
       {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0"},
-      {:poison, "~> 1.5"},
-      {:ex_doc, "~> 0.11"},
+      {:poison, "~> 1.5", only: :test},
       {:phoenix, "~> 1.1.4", only: :test},
       {:cowboy, "~> 1.0", only: :test},
-      {:gproc, "~> 0.5.0", only: :test}
+      {:gproc, "~> 0.5.0", only: :test},
+      {:ex_doc, "~> 0.11", only: :docs},
+      {:earmark, "~> 0.2", only: :docs}
     ]
   end
 
