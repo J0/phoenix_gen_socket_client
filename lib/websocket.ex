@@ -1,0 +1,76 @@
+defmodule Channels.Client.WebsocketTransport do
+  @moduledoc """
+  Websocket adapter for `Channels.Client.Socket`.
+
+  This modules implements a plain websocket client which runs in a separate
+  process. The module exposes the interface required by `Channels.Client.Socket`
+  and notifies the socket process on transport event, such as message arrivals,
+  or disconnects.
+  """
+  @behaviour :websocket_client
+
+  require Logger
+  require Record
+  alias Channels.Client.Socket
+
+
+  # -------------------------------------------------------------------
+  # API functions
+  # -------------------------------------------------------------------
+
+  @doc "Starts the websocket process."
+  @spec start_link(String.t) :: {:ok, pid} | {:error, any}
+  def start_link(url) do
+    url
+    |> to_char_list()
+    |> :websocket_client.start_link(__MODULE__, [self()])
+  end
+
+  @doc "Pushes the encoded message to the websocket process."
+  @spec push(pid, :websocket_req.frame) :: :ok
+  def push(pid, frame) do
+    send(pid, {:send_frame, frame})
+    :ok
+  end
+
+
+  # -------------------------------------------------------------------
+  # :websocket_client callbacks
+  # -------------------------------------------------------------------
+
+  @doc false
+  def init([socket]), do: {:once, %{socket: socket}}
+
+  @doc false
+  def onconnect(_req, state) do
+    Socket.notify_connected(state.socket)
+    {:ok, state}
+  end
+
+  @doc false
+  def websocket_handle({type, message}, _req, state) when type in [:text, :binary] do
+    Socket.notify_message(state.socket, message)
+    {:ok, state}
+  end
+  def websocket_handle(other_msg, _req, state) do
+    Logger.warn(fn -> "Unknown message #{inspect other_msg}" end)
+    {:ok, state}
+  end
+
+  @doc false
+  def websocket_info({:send_frame, frame}, _req, state),
+    do: {:reply, frame, state}
+  def websocket_info(_message, _req, state),
+    do: {:ok, state}
+
+  @doc false
+  def ondisconnect(reason, state) do
+    Socket.notify_disconnected(state.socket, reason)
+    {:close, :normal, state}
+  end
+
+  @doc false
+  def websocket_terminate(reason, _req, _state) do
+    Logger.info(fn -> "Websocket connection closed with reason #{inspect reason}" end)
+  end
+end
