@@ -14,7 +14,7 @@ defmodule PhoenixGenSocketClient.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :gproc]]
+    [applications: [:logger]]
   end
 
   defp deps do
@@ -24,7 +24,7 @@ defmodule PhoenixGenSocketClient.Mixfile do
       {:ex_doc, "~> 0.11"},
       {:phoenix, "~> 1.1.4", only: :test},
       {:cowboy, "~> 1.0", only: :test},
-      {:gproc, "~> 0.5.0"}
+      {:gproc, "~> 0.5.0", only: :test}
     ]
   end
 

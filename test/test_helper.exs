@@ -1,4 +1,4 @@
-for test_app <- [:cowboy, :phoenix] do
+for test_app <- [:gproc, :cowboy, :phoenix] do
   {:ok, _} = Application.ensure_all_started(test_app)
 end
 
