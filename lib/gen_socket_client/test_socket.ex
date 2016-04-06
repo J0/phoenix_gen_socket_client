@@ -21,9 +21,9 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   # -------------------------------------------------------------------
 
   @doc "Starts the driver process."
-  @spec start_link(String.t, GenSocketClient.socket_opts) :: GenServer.on_start
-  def start_link(url, socket_opts \\ []),
-    do: GenSocketClient.start_link(__MODULE__, {url, self}, socket_opts)
+  @spec start_link(module, String.t, GenSocketClient.socket_opts) :: GenServer.on_start
+  def start_link(transport, url, socket_opts \\ []),
+    do: GenSocketClient.start_link(__MODULE__, transport, {url, self}, socket_opts)
 
   @doc "Connect to the server."
   @spec connect(GenServer.server, GenServer.timeout) :: :ok | {:error, any}

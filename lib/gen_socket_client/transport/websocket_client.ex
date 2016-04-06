@@ -1,12 +1,9 @@
-defmodule Phoenix.Channels.GenSocketClient.WebSocketClient do
+defmodule Phoenix.Channels.GenSocketClient.Transport.WebsocketClient do
   @moduledoc """
-  Websocket adapter for `Phoenix.Channels.GenSocketClient`.
-
-  This modules implements a plain websocket client which runs in a separate
-  process. The module exposes the interface required by `Phoenix.Channels.GenSocketClient`
-  and notifies the socket process on transport event, such as message arrivals,
-  or disconnects.
+  Websocket transport powered by the [websocket_client](https://github.com/sanmiguel/websocket_client)
+  library.
   """
+  @behaviour Phoenix.Channels.GenSocketClient.Transport
   @behaviour :websocket_client
 
   require Logger
@@ -15,19 +12,17 @@ defmodule Phoenix.Channels.GenSocketClient.WebSocketClient do
 
 
   # -------------------------------------------------------------------
-  # API functions
+  # Phoenix.Channels.GenSocketClient.Transport callbacks
   # -------------------------------------------------------------------
 
-  @doc "Starts the websocket process."
-  @spec start_link(String.t) :: {:ok, pid} | {:error, any}
+  @doc false
   def start_link(url) do
     url
     |> to_char_list()
     |> :websocket_client.start_link(__MODULE__, [self()])
   end
 
-  @doc "Pushes the encoded message to the websocket process."
-  @spec push(pid, :websocket_req.frame) :: :ok
+  @doc false
   def push(pid, frame) do
     send(pid, {:send_frame, frame})
     :ok

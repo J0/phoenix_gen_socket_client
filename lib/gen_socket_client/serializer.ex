@@ -9,7 +9,7 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer do
   @callback decode_message(GenSocketClient.encoded_message) :: GenSocketClient.message
 
   @doc "Invoked to encode a socket message."
-  @callback encode_message(GenSocketClient.message) :: {:text | :binary, GenSocketClient.encoded_message}
+  @callback encode_message(GenSocketClient.message) :: Phoenix.Channels.GenSocketClient.Transport.frame
 end
 
 defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
