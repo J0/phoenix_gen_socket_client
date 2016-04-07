@@ -1,5 +1,8 @@
 # phoenix_gen_socket_client
 
+[![Build
+Status](https://travis-ci.org/Aircloak/phoenix_gen_socket_client.svg?branch=master)](https://travis-ci.org/Aircloak/phoenix_gen_socket_client)
+
 This library implements an Elixir client for Phoenix Channels protocol. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
 
 
