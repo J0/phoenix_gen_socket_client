@@ -90,7 +90,8 @@ defmodule Phoenix.Channels.GenSocketClient do
 
   @doc "Invoked when the process is created."
   @callback init(arg::any) ::
-    {:ok, url::String.t, callback_state} |
+    {:connect, url::String.t, callback_state} |
+    {:noconnect, url::String.t, callback_state} |
     :ignore |
     {:error, reason::any}
 
@@ -193,17 +194,19 @@ defmodule Phoenix.Channels.GenSocketClient do
   @doc false
   def init({callback, transport_mod, arg, socket_opts}) do
     case callback.init(arg) do
-      {:ok, url, callback_state} ->
-        {:ok, %{
-          url: url,
-          transport_mod: transport_mod,
-          serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
-          callback: callback,
-          callback_state: callback_state,
-          transport_pid: nil,
-          transport_mref: nil,
-          message_refs: :ets.new(:message_refs, [:private, :set])
-        }}
+      {action, url, callback_state} when action in [:connect, :noconnect] ->
+        {:ok,
+          maybe_connect(action, %{
+            url: url,
+            transport_mod: transport_mod,
+            serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
+            callback: callback,
+            callback_state: callback_state,
+            transport_pid: nil,
+            transport_mref: nil,
+            message_refs: :ets.new(:message_refs, [:private, :set])
+          })
+        }
       other -> other
     end
   end
@@ -265,6 +268,9 @@ defmodule Phoenix.Channels.GenSocketClient do
   # -------------------------------------------------------------------
   # Internal functions
   # -------------------------------------------------------------------
+
+  defp maybe_connect(:connect, state), do: connect(state)
+  defp maybe_connect(:noconnect, state), do: state
 
   defp connect(%{transport_pid: nil} = state) do
     {:ok, transport_pid} = state.transport_mod.start_link(state.url)

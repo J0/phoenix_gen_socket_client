@@ -16,18 +16,21 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "connection success" do
     assert {:ok, socket} = start_socket()
-    assert :ok == TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
+    assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1")
   end
 
-  test "join socket" do
-    assert {:ok, socket} = start_socket()
-    assert :ok == TestSocket.connect(socket)
+  test "no auto connect" do
+    assert {:ok, socket} = start_socket(url(), false)
+    refute :connected == TestSocket.wait_connect_status(socket, 100)
+    TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
     assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1")
   end
 
   test "client message push" do
     assert {:ok, socket} = start_socket()
-    assert :ok == TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
     assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1", %{"foo" => "bar"})
     assert {:ok, _ref} = TestSocket.push(socket, "channel:1", "some_event", %{"foo" => "bar"})
     assert_receive {TestSite.Channel, {:handle_in, "some_event", %{"foo" => "bar"}}}
@@ -71,28 +74,32 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "connection error" do
     assert {:ok, socket} = start_socket("ws://127.0.0.1:29877")
-    assert {:error, :econnrefused} == TestSocket.connect(socket)
+    assert {:disconnected, :econnrefused} == TestSocket.wait_connect_status(socket)
   end
 
   test "connection refused by socket" do
     assert {:ok, socket} = start_socket(url(%{shared_secret: "invalid_secret"}))
-    assert {:error, {403, "Forbidden"}} == TestSocket.connect(socket)
+    assert {:disconnected, {403, "Forbidden"}} == TestSocket.wait_connect_status(socket)
   end
 
   test "transport process terminates" do
     assert {:ok, socket} = start_socket()
-    assert :ok == TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
     transport_pid = :sys.get_state(socket).transport_pid
     GenServer.stop(transport_pid)
-    assert_receive {^socket, :disconnected, {:transport_down, :normal}}
+    assert {:disconnected, {:transport_down, :normal}} == TestSocket.wait_connect_status(socket)
 
     # verify that we can reconnect and use the socket
-    assert :ok == TestSocket.connect(socket)
+    TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
     assert {:ok, {"channel:1", _}} = TestSocket.join(socket, "channel:1")
   end
 
   test "can't interact when disconnected" do
     assert {:ok, socket} = start_socket()
+    transport_pid = :sys.get_state(socket).transport_pid
+    GenServer.stop(transport_pid)
+    assert {:disconnected, _} = TestSocket.wait_connect_status(socket)
     assert {:error, :disconnected} = TestSocket.join(socket, "channel:1")
     assert {:error, :disconnected} = TestSocket.leave(socket, "channel:1")
     assert {:error, :disconnected} = TestSocket.push(socket, "channel:1", "some_event")
@@ -101,7 +108,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "refused channel join" do
     assert {:ok, socket} = start_socket()
-    assert :ok == TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
     assert {:error, reason} = TestSocket.join(socket, "invalid_channel")
     assert {:server_rejected, "invalid_channel", %{"reason" => "unmatched topic"}} == reason
   end
@@ -114,7 +121,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "no push before join" do
     assert {:ok, socket} = start_socket()
-    assert :ok == TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
     assert {:error, :not_joined} == TestSocket.push(socket, "channel:1", "some_event")
 
     # Verify that we can still join after the invalid push
@@ -140,15 +147,15 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   defp join_channel do
     assert {:ok, socket} = start_socket()
-    assert :ok == TestSocket.connect(socket)
+    assert :connected == TestSocket.wait_connect_status(socket)
     assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1")
     assert_receive {TestSite.Channel, {:join, "channel:1", _, server_channel}}
 
     %{socket: socket, server_channel: server_channel}
   end
 
-  defp start_socket(url \\ url()) do
-    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url)
+  defp start_socket(url \\ url(), connect \\ true) do
+    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url, connect)
   end
 
   defp url(params \\ %{shared_secret: "supersecret"}) do

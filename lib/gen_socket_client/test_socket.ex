@@ -21,19 +21,27 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   # -------------------------------------------------------------------
 
   @doc "Starts the driver process."
-  @spec start_link(module, String.t, GenSocketClient.socket_opts) :: GenServer.on_start
-  def start_link(transport, url, socket_opts \\ []),
-    do: GenSocketClient.start_link(__MODULE__, transport, {url, self}, socket_opts)
+  @spec start_link(module, String.t, boolean, GenSocketClient.socket_opts) :: GenServer.on_start
+  def start_link(transport, url, connect \\ true, socket_opts \\ []),
+    do: GenSocketClient.start_link(__MODULE__, transport, {url, connect, self}, socket_opts)
 
   @doc "Connect to the server."
-  @spec connect(GenServer.server, GenServer.timeout) :: :ok | {:error, any}
-  def connect(socket, timeout \\ :timer.seconds(5)) do
+  @spec connect(GenServer.server) :: :ok
+  def connect(socket) do
     send(socket, :connect)
+    :ok
+  end
 
+  @doc "Waits until the socket is connected or disconnected"
+  @spec wait_connect_status(GenServer.server, GenServer.timeout) ::
+      :connected |
+      {:disconnected, any} |
+      {:error, :timeout}
+  def wait_connect_status(socket, timeout \\ :timer.seconds(5)) do
     receive do
-      {^socket, :connected} -> :ok
-      {^socket, :disconnected, {:error, reason}} -> {:error, reason}
-      {^socket, :disconnected, reason} -> {:error, reason}
+      {^socket, :connected} -> :connected
+      {^socket, :disconnected, {:error, reason}} -> {:disconnected, reason}
+      {^socket, :disconnected, reason} -> {:disconnected, reason}
     after timeout ->
       {:error, :timeout}
     end
@@ -122,8 +130,8 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   # -------------------------------------------------------------------
 
   @doc false
-  def init({url, client}),
-    do: {:ok, url, client}
+  def init({url, true, client}), do: {:connect, url, client}
+  def init({url, false, client}), do: {:noconnect, url, client}
 
   @doc false
   def handle_connected(_transport, client) do

@@ -73,33 +73,24 @@ GenSocketClient.start_link(
 
 For `transport_module` you can pass any module which implements the `Phoenix.Channels.GenSocketClient.Transport` behaviour. Out of the box, you have the module `Phoenix.Channels.GenSocketClient.Transport.WebSocketClient` available.
 
-The code above will start another process where the `init/1` function of the `callback_module` is invoked. This function needs to provide the initial state and the socket url.
+The code above will start another process where the `init/1` function of the `callback_module` is invoked. This function needs to provide the initial state and the socket url. The tuple also determines whether the connection will be immediately established or not.
 
 The socket url must also include the transport suffix. For example, if in the server socket you have declared socket with `socket "/my_socket", ...`, then the url for the websocket transport would be `ws://server_url/my_socket/websocket`.
 
 
 ### Connection life-cycle
 
-After `init/1` returns, the transport process is not immediately created. You need to do this manually from one of `handle_*` callbacks. To initially establish the connection, you can send yourself a message from `init/1`, and then request the connection to be established in `handle_info/2`:
+If `init/1` returns `{:connect, url, initial_state}`, the connection will be established immediately. The connection is established in a separate process, which we call the _transport process_. This process is the immediate child of the socket process. Consequently, all communication takes place concurrently to the socket process. If you handle some Erlang messages in the socket process, you may need to keep track of whether you're connected or not.
 
-```elixir
-def init(arg) do
-  send(self(), :connect)
-  {:ok, socket_url, initial_state}
-end
+If the connection is established, the `handle_connected/2` callback will be invoked. If establishing of the connection fails, `handle_disconnected/2` callback is invoked. The same callback is invoked if the established connection is lost.
 
-def handle_info(:connect, _transport, state) do
-  {:connect, state}
-end
-```
+If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple.
 
-The `{:connect, state}` instructs the behaviour to connect to the socket on the given url. If that succeeds, the `handle_connected/2` callback will be invoked. If the connection is not established, `handle_disconnected/2` callback is invoked. The same callback is invoked if the established connection is lost.
-
-The connection is established in a separate process, which we call the _transport process_. This process is the immediate child of the socket process. Consequently, all communication takes place concurrently to the socket process. If you handle some Erlang messages in the socket process, you may need to keep track of whether you're connected or not.
+Finally, you can also decide to connect at some later time by returning `{:noconnect, url, state}` from the `init/1` callback. To connect later, you need to send an Erlang message to the socket process, and return `{:connect, state}` tuple.
 
 Though somewhat elaborate, this approach has following benefits:
 
-1. The socket process can start immediately without waiting for the connection to be established.
+1. The socket process starts immediately without waiting for the connection to be established.
 2. The socket process can live in the supervision tree even if the connection is not established.
 3. Implementing reconnection logic is very flexible. You can trigger a reconnect directly from `handle_disconnected/2`, or send yourself a delayed message. You can also easily accumulate outgoing messages until you reconnect, or you can attempt a finite number of reconnects and then give up.
 
