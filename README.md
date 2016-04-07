@@ -122,3 +122,15 @@ To send a message on the connected channel, you can use `GenSocketClient.push/4`
 If the server-side channel replies directly (using the `{:reply, ...}`), the `handle_reply/5` callback is invoked with the matching ref. Refs are unique only per channel-session. Two channels can use the same refs. Also, refs can be reused after you rejoin a topic.
 
 If the server sends an asynchronous message (i.e. not a direct reply), the `handle_message/5` callback is invoked.
+
+
+## Status
+
+This library is in a very early alpha, so it's highly unstable and untested. Breaking changes are very likely. Use at your own peril :-)
+
+
+## Copyright and License
+
+Copyright (c) 2016 Aircloak
+
+The source code is licensed under the [MIT License](./LICENSE.md).
