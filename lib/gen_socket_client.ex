@@ -71,7 +71,12 @@ defmodule Phoenix.Channels.GenSocketClient do
 
   @type socket_opts :: [{:serializer, module}]
   @type callback_state :: any
-  @type transport :: %{transport: pid | nil, message_refs: :ets.tab, serializer: module}
+  @opaque transport :: %{
+    transport_mod: module,
+    transport: pid | nil,
+    message_refs: :ets.tab,
+    serializer: module
+  }
   @type topic :: String.t
   @type event :: String.t
   @type payload :: %{String.t => any}
@@ -124,9 +129,10 @@ defmodule Phoenix.Channels.GenSocketClient do
   # -------------------------------------------------------------------
 
   @doc "Starts the socket process."
-  @spec start_link(callback::module, transport::module, any, socket_opts, GenServer.options) :: GenServer.on_start
-  def start_link(callback, transport, arg, socket_opts \\ [], gen_server_opts \\ []) do
-    GenServer.start_link(__MODULE__, {callback, transport, arg, socket_opts}, gen_server_opts)
+  @spec start_link(callback::module, transport_mod::module, any, socket_opts, GenServer.options) ::
+      GenServer.on_start
+  def start_link(callback, transport_mod, arg, socket_opts \\ [], gen_server_opts \\ []) do
+    GenServer.start_link(__MODULE__, {callback, transport_mod, arg, socket_opts}, gen_server_opts)
   end
 
   @doc "Joins the topic."
@@ -154,7 +160,7 @@ defmodule Phoenix.Channels.GenSocketClient do
         {:error, :already_joined}
       true ->
         frame = transport.serializer.encode_message(%{topic: topic, event: event, payload: payload, ref: ref})
-        transport.transport.push(transport.transport_pid, frame)
+        transport.transport_mod.push(transport.transport_pid, frame)
         {:ok, ref}
     end
   end
@@ -185,12 +191,12 @@ defmodule Phoenix.Channels.GenSocketClient do
   # -------------------------------------------------------------------
 
   @doc false
-  def init({callback, transport, arg, socket_opts}) do
+  def init({callback, transport_mod, arg, socket_opts}) do
     case callback.init(arg) do
       {:ok, url, callback_state} ->
         {:ok, %{
           url: url,
-          transport: transport,
+          transport_mod: transport_mod,
           serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
           callback: callback,
           callback_state: callback_state,
@@ -261,7 +267,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   # -------------------------------------------------------------------
 
   defp connect(%{transport_pid: nil} = state) do
-    {:ok, transport_pid} = state.transport.start_link(state.url)
+    {:ok, transport_pid} = state.transport_mod.start_link(state.url)
     transport_mref = Process.monitor(transport_pid)
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
@@ -273,7 +279,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   end
 
   defp transport(state),
-    do: Map.take(state, [:transport, :transport_pid, :message_refs, :serializer])
+    do: Map.take(state, [:transport_mod, :transport_pid, :message_refs, :serializer])
 
   defp next_ref(topic, message_refs),
     do: :ets.update_counter(message_refs, topic, 1, {topic, 0})
