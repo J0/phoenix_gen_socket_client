@@ -6,6 +6,11 @@ Status](https://travis-ci.org/Aircloak/phoenix_gen_socket_client.svg?branch=mast
 This library implements an Elixir client for Phoenix Channels protocol. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
 
 
+## Status
+
+This library is in a very early alpha, so it's highly unstable and untested. Breaking changes are very likely. Use at your own peril :-)
+
+
 ## Prerequisites
 
 You need to add the project as a dependency to your `mix.exs`:
@@ -116,11 +121,6 @@ To send a message on the connected channel, you can use `GenSocketClient.push/4`
 If the server-side channel replies directly (using the `{:reply, ...}`), the `handle_reply/5` callback is invoked with the matching ref. Refs are unique only per channel-session. Two channels can use the same refs. Also, refs can be reused after you rejoin a topic.
 
 If the server sends an asynchronous message (i.e. not a direct reply), the `handle_message/5` callback is invoked.
-
-
-## Status
-
-This library is in a very early alpha, so it's highly unstable and untested. Breaking changes are very likely. Use at your own peril :-)
 
 
 ## Copyright and License
