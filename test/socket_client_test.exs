@@ -148,7 +148,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
   end
 
   defp start_socket(url \\ url()) do
-    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebsocketClient, url)
+    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url)
   end
 
   defp url(params \\ %{shared_secret: "supersecret"}) do

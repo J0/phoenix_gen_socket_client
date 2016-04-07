@@ -71,7 +71,7 @@ GenSocketClient.start_link(
 )
 ```
 
-For `transport_module` you can pass any module which implements the `Phoenix.Channels.GenSocketClient.Transport` behaviour. Out of the box, you have the module `Phoenix.Channels.GenSocketClient.Transport.WebsocketClient` available.
+For `transport_module` you can pass any module which implements the `Phoenix.Channels.GenSocketClient.Transport` behaviour. Out of the box, you have the module `Phoenix.Channels.GenSocketClient.Transport.WebSocketClient` available.
 
 The code above will start another process where the `init/1` function of the `callback_module` is invoked. This function needs to provide the initial state and the socket url.
 

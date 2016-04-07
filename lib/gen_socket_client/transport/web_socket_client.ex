@@ -1,4 +1,4 @@
-defmodule Phoenix.Channels.GenSocketClient.Transport.WebsocketClient do
+defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   @moduledoc """
   Websocket transport powered by the [websocket_client](https://github.com/sanmiguel/websocket_client)
   library.

@@ -7,7 +7,7 @@ defmodule Example.SocketClient do
   def start_link() do
     GenSocketClient.start_link(
           __MODULE__,
-          Phoenix.Channels.GenSocketClient.Transport.WebsocketClient,
+          Phoenix.Channels.GenSocketClient.Transport.WebSocketClient,
           "ws://localhost:4000/socket/websocket"
         )
   end
