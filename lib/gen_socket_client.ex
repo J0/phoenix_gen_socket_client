@@ -73,7 +73,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   @type callback_state :: any
   @opaque transport :: %{
     transport_mod: module,
-    transport: pid | nil,
+    transport_pid: pid | nil,
     message_refs: :ets.tab,
     serializer: module
   }
