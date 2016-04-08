@@ -1,5 +1,26 @@
+sudo: false
 language: elixir
 elixir:
   - 1.2.3
 otp_release:
   - 18.2.1
+env:
+  global:
+    - MIX_HOME=$(pwd)/.mix
+cache:
+  directories:
+  - deps
+  - _build
+install:
+  - mkdir -p $MIX_HOME
+  - mix local.hex --force
+before_script:
+  - mix deps.get
+  - mix compile --warnings-as-errors
+  - MIX_ENV=test mix compile --warnings-as-errors
+script:
+  - MIX_ENV=docs mix docs
+  - mix credo --strict
+  - MIX_ENV=test mix credo --strict
+  - mix test
+  - mix dialyze

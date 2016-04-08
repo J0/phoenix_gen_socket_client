@@ -1,33 +1,28 @@
-defmodule Channels.Client.WebsocketTransport do
+defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   @moduledoc """
-  Websocket adapter for `Channels.Client.Socket`.
-
-  This modules implements a plain websocket client which runs in a separate
-  process. The module exposes the interface required by `Channels.Client.Socket`
-  and notifies the socket process on transport event, such as message arrivals,
-  or disconnects.
+  Websocket transport powered by the [websocket_client](https://github.com/sanmiguel/websocket_client)
+  library.
   """
+  @behaviour Phoenix.Channels.GenSocketClient.Transport
   @behaviour :websocket_client
 
   require Logger
   require Record
-  alias Channels.Client.Socket
+  alias Phoenix.Channels.GenSocketClient
 
 
   # -------------------------------------------------------------------
-  # API functions
+  # Phoenix.Channels.GenSocketClient.Transport callbacks
   # -------------------------------------------------------------------
 
-  @doc "Starts the websocket process."
-  @spec start_link(String.t) :: {:ok, pid} | {:error, any}
+  @doc false
   def start_link(url) do
     url
     |> to_char_list()
     |> :websocket_client.start_link(__MODULE__, [self()])
   end
 
-  @doc "Pushes the encoded message to the websocket process."
-  @spec push(pid, :websocket_req.frame) :: :ok
+  @doc false
   def push(pid, frame) do
     send(pid, {:send_frame, frame})
     :ok
@@ -43,13 +38,13 @@ defmodule Channels.Client.WebsocketTransport do
 
   @doc false
   def onconnect(_req, state) do
-    Socket.notify_connected(state.socket)
+    GenSocketClient.notify_connected(state.socket)
     {:ok, state}
   end
 
   @doc false
   def websocket_handle({type, message}, _req, state) when type in [:text, :binary] do
-    Socket.notify_message(state.socket, message)
+    GenSocketClient.notify_message(state.socket, message)
     {:ok, state}
   end
   def websocket_handle(other_msg, _req, state) do
@@ -65,7 +60,7 @@ defmodule Channels.Client.WebsocketTransport do
 
   @doc false
   def ondisconnect(reason, state) do
-    Socket.notify_disconnected(state.socket, reason)
+    GenSocketClient.notify_disconnected(state.socket, reason)
     {:close, :normal, state}
   end
 

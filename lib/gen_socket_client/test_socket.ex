@@ -1,19 +1,19 @@
-defmodule Channels.Client.TestSocket do
+defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   @moduledoc """
   A simple synchronous Phoenix Channels client.
 
-  This module implements the `Channels.Client.Socket` behaviour to provide
+  This module implements the `Phoenix.Channels.GenSocketClient` behaviour to provide
   a controllable API for channel clients. The implementation is very basic,
   and is useful for tests only. It's not advised to use this module in
   production, because there are various edge cases which can cause subtle
   bugs. You're instead advised to implement your own callback for the
-  `Channels.Client.Socket` behaviour.
+  `Phoenix.Channels.GenSocketClient` behaviour.
 
   Notice that the module is defined in the lib (and not in the test), which
   allows us to reuse it in tests of other projects (such as air).
   """
-  alias Channels.Client.Socket
-  @behaviour Socket
+  alias Phoenix.Channels.GenSocketClient
+  @behaviour GenSocketClient
 
 
   # -------------------------------------------------------------------
@@ -21,27 +21,35 @@ defmodule Channels.Client.TestSocket do
   # -------------------------------------------------------------------
 
   @doc "Starts the driver process."
-  @spec start_link(String.t, Socket.socket_opts) :: GenServer.on_start
-  def start_link(url, socket_opts \\ []),
-    do: Socket.start_link(__MODULE__, {url, self}, socket_opts)
+  @spec start_link(module, String.t, boolean, GenSocketClient.socket_opts) :: GenServer.on_start
+  def start_link(transport, url, connect \\ true, socket_opts \\ []),
+    do: GenSocketClient.start_link(__MODULE__, transport, {url, connect, self}, socket_opts)
 
   @doc "Connect to the server."
-  @spec connect(GenServer.server, GenServer.timeout) :: :ok | {:error, any}
-  def connect(socket, timeout \\ :timer.seconds(5)) do
+  @spec connect(GenServer.server) :: :ok
+  def connect(socket) do
     send(socket, :connect)
+    :ok
+  end
 
+  @doc "Waits until the socket is connected or disconnected"
+  @spec wait_connect_status(GenServer.server, GenServer.timeout) ::
+      :connected |
+      {:disconnected, any} |
+      {:error, :timeout}
+  def wait_connect_status(socket, timeout \\ :timer.seconds(5)) do
     receive do
-      {^socket, :connected} -> :ok
-      {^socket, :disconnected, {:error, reason}} -> {:error, reason}
-      {^socket, :disconnected, reason} -> {:error, reason}
+      {^socket, :connected} -> :connected
+      {^socket, :disconnected, {:error, reason}} -> {:disconnected, reason}
+      {^socket, :disconnected, reason} -> {:disconnected, reason}
     after timeout ->
       {:error, :timeout}
     end
   end
 
   @doc "Joins a topic on the connected socket."
-  @spec join(GenServer.server, Socket.topic, Socket.payload, GenServer.timeout) ::
-    {:ok, {Socket.topic, Socket.payload}} |
+  @spec join(GenServer.server, GenSocketClient.topic, GenSocketClient.payload, GenServer.timeout) ::
+    {:ok, {GenSocketClient.topic, GenSocketClient.payload}} |
     {:error, any}
   def join(socket, topic, payload \\ %{}, timeout \\ 5000) do
     send(socket, {:join, topic, payload})
@@ -55,8 +63,8 @@ defmodule Channels.Client.TestSocket do
   end
 
   @doc "Leaves the topic."
-  @spec leave(GenServer.server, Socket.topic, Socket.payload, GenServer.timeout) ::
-    {:ok, Socket.payload} |
+  @spec leave(GenServer.server, GenSocketClient.topic, GenSocketClient.payload, GenServer.timeout) ::
+    {:ok, GenSocketClient.payload} |
     {:error, any}
   def leave(socket, topic, payload \\ %{}, timeout \\ 5000) do
     send(socket, {:leave, topic, payload})
@@ -76,8 +84,9 @@ defmodule Channels.Client.TestSocket do
   end
 
   @doc "Pushes a message to the topic."
-  @spec push(GenServer.server, Socket.topic, Socket.event, Socket.payload, GenServer.timeout) ::
-    {:ok, Socket.ref} |
+  @spec push(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload,
+      GenServer.timeout) ::
+    {:ok, GenSocketClient.ref} |
     {:error, any}
   def push(socket, topic, event, payload \\ %{}, timeout \\ 5000) do
     send(socket, {:push, topic, event, payload})
@@ -90,8 +99,9 @@ defmodule Channels.Client.TestSocket do
   end
 
   @doc "Pushes a message to the topic and awaits the direct response from the server."
-  @spec push_sync(GenServer.server, Socket.topic, Socket.event, Socket.payload, GenServer.timeout) ::
-    {:ok, Socket.payload} |
+  @spec push_sync(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload,
+      GenServer.timeout) ::
+    {:ok, GenSocketClient.payload} |
     {:error, any}
   def push_sync(socket, topic, event, payload \\ %{}, timeout \\ 5000) do
     with {:ok, ref} <- push(socket, topic, event, payload, timeout) do
@@ -105,7 +115,7 @@ defmodule Channels.Client.TestSocket do
 
   @doc "Awaits a message from the socket."
   @spec await_message(GenServer.server, GenServer.timeout) ::
-    {:ok, Socket.topic, Socket.event, Socket.payload} | {:error, :timeout}
+    {:ok, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload} | {:error, :timeout}
   def await_message(socket, timeout \\ 5000) do
     receive do
       {^socket, :message, message} -> {:ok, message}
@@ -116,12 +126,12 @@ defmodule Channels.Client.TestSocket do
 
 
   # -------------------------------------------------------------------
-  # Channels.Client.Socket callbacks
+  # Channels.Client.GenSocketClient callbacks
   # -------------------------------------------------------------------
 
   @doc false
-  def init({url, client}),
-    do: {:ok, url, client}
+  def init({url, true, client}), do: {:connect, url, client}
+  def init({url, false, client}), do: {:noconnect, url, client}
 
   @doc false
   def handle_connected(_transport, client) do
@@ -169,7 +179,7 @@ defmodule Channels.Client.TestSocket do
   def handle_info(:connect, _transport, client),
     do: {:connect, client}
   def handle_info({:join, topic, payload}, transport, client) do
-    case Socket.join(transport, topic, payload) do
+    case GenSocketClient.join(transport, topic, payload) do
       {:error, reason} -> send(client, {self(), :join_error, reason})
       {:ok, _ref} -> :ok
     end
@@ -177,14 +187,14 @@ defmodule Channels.Client.TestSocket do
     {:ok, client}
   end
   def handle_info({:leave, topic, payload}, transport, client) do
-    case Socket.leave(transport, topic, payload) do
+    case GenSocketClient.leave(transport, topic, payload) do
       {:error, reason} -> send(client, {self(), :leave_error, reason})
       {:ok, ref} -> send(client, {self(), :leave_ref, ref})
     end
     {:ok, client}
   end
   def handle_info({:push, topic, event, payload}, transport, client) do
-    push_result = Socket.push(transport, topic, event, payload)
+    push_result = GenSocketClient.push(transport, topic, event, payload)
     send(client, {self(), :push_result, push_result})
     {:ok, client}
   end

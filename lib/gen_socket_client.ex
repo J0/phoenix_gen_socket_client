@@ -1,4 +1,4 @@
-defmodule Channels.Client.Socket do
+defmodule Phoenix.Channels.GenSocketClient do
   @moduledoc """
   Communication with a Phoenix Channels server.
 
@@ -7,7 +7,7 @@ defmodule Channels.Client.Socket do
   supported.
 
   The module is implemented as a behaviour. To use it, you need to implement the
-  callback module. Then, you can invoke `start_link/3` to start the socket process.
+  callback module. Then, you can invoke `start_link/5` to start the socket process.
   The communication with the server is then controlled from that process.
 
   The connection is not automatically established during the creation. Instead,
@@ -68,11 +68,15 @@ defmodule Channels.Client.Socket do
   you can simply return `{:stop, reason, state}` from any of the callback.
   """
   use GenServer
-  alias Channels.Client.WebsocketTransport
 
   @type socket_opts :: [{:serializer, module}]
   @type callback_state :: any
-  @type transport :: %{transport: pid | nil, message_refs: :ets.tab, serializer: module}
+  @opaque transport :: %{
+    transport_mod: module,
+    transport_pid: pid | nil,
+    message_refs: :ets.tab,
+    serializer: module
+  }
   @type topic :: String.t
   @type event :: String.t
   @type payload :: %{String.t => any}
@@ -86,7 +90,8 @@ defmodule Channels.Client.Socket do
 
   @doc "Invoked when the process is created."
   @callback init(arg::any) ::
-    {:ok, url::String.t, callback_state} |
+    {:connect, url::String.t, callback_state} |
+    {:noconnect, url::String.t, callback_state} |
     :ignore |
     {:error, reason::any}
 
@@ -125,9 +130,10 @@ defmodule Channels.Client.Socket do
   # -------------------------------------------------------------------
 
   @doc "Starts the socket process."
-  @spec start_link(module, any, socket_opts, GenServer.options) :: GenServer.on_start
-  def start_link(callback, arg, socket_opts \\ [], gen_server_opts \\ []) do
-    GenServer.start_link(__MODULE__, {callback, arg, socket_opts}, gen_server_opts)
+  @spec start_link(callback::module, transport_mod::module, any, socket_opts, GenServer.options) ::
+      GenServer.on_start
+  def start_link(callback, transport_mod, arg, socket_opts \\ [], gen_server_opts \\ []) do
+    GenServer.start_link(__MODULE__, {callback, transport_mod, arg, socket_opts}, gen_server_opts)
   end
 
   @doc "Joins the topic."
@@ -155,7 +161,7 @@ defmodule Channels.Client.Socket do
         {:error, :already_joined}
       true ->
         frame = transport.serializer.encode_message(%{topic: topic, event: event, payload: payload, ref: ref})
-        WebsocketTransport.push(transport.transport_pid, frame)
+        transport.transport_mod.push(transport.transport_pid, frame)
         {:ok, ref}
     end
   end
@@ -186,18 +192,21 @@ defmodule Channels.Client.Socket do
   # -------------------------------------------------------------------
 
   @doc false
-  def init({callback, arg, socket_opts}) do
+  def init({callback, transport_mod, arg, socket_opts}) do
     case callback.init(arg) do
-      {:ok, url, callback_state} ->
-        {:ok, %{
-          url: url,
-          serializer: Keyword.get(socket_opts, :serializer, Channels.Client.Socket.Serializer.Json),
-          callback: callback,
-          callback_state: callback_state,
-          transport_pid: nil,
-          transport_mref: nil,
-          message_refs: :ets.new(:message_refs, [:private, :set])
-        }}
+      {action, url, callback_state} when action in [:connect, :noconnect] ->
+        {:ok,
+          maybe_connect(action, %{
+            url: url,
+            transport_mod: transport_mod,
+            serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
+            callback: callback,
+            callback_state: callback_state,
+            transport_pid: nil,
+            transport_mref: nil,
+            message_refs: :ets.new(:message_refs, [:private, :set])
+          })
+        }
       other -> other
     end
   end
@@ -260,8 +269,11 @@ defmodule Channels.Client.Socket do
   # Internal functions
   # -------------------------------------------------------------------
 
+  defp maybe_connect(:connect, state), do: connect(state)
+  defp maybe_connect(:noconnect, state), do: state
+
   defp connect(%{transport_pid: nil} = state) do
-    {:ok, transport_pid} = WebsocketTransport.start_link(state.url)
+    {:ok, transport_pid} = state.transport_mod.start_link(state.url)
     transport_mref = Process.monitor(transport_pid)
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
@@ -273,7 +285,7 @@ defmodule Channels.Client.Socket do
   end
 
   defp transport(state),
-    do: Map.take(state, [:transport_pid, :message_refs, :serializer])
+    do: Map.take(state, [:transport_mod, :transport_pid, :message_refs, :serializer])
 
   defp next_ref(topic, message_refs),
     do: :ets.update_counter(message_refs, topic, 1, {topic, 0})
