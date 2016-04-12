@@ -69,7 +69,11 @@ defmodule Phoenix.Channels.GenSocketClient do
   """
   use GenServer
 
-  @type socket_opts :: [{:serializer, module}]
+  @type transport_opts :: any
+  @type socket_opts :: [
+    serializer: module,
+    transport_opts: transport_opts
+  ]
   @type callback_state :: any
   @opaque transport :: %{
     transport_mod: module,
@@ -199,6 +203,7 @@ defmodule Phoenix.Channels.GenSocketClient do
           maybe_connect(action, %{
             url: url,
             transport_mod: transport_mod,
+            transport_opts: Keyword.get(socket_opts, :transport_opts, []),
             serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
             callback: callback,
             callback_state: callback_state,
@@ -273,7 +278,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   defp maybe_connect(:noconnect, state), do: state
 
   defp connect(%{transport_pid: nil} = state) do
-    {:ok, transport_pid} = state.transport_mod.start_link(state.url)
+    {:ok, transport_pid} = state.transport_mod.start_link(state.url, state.transport_opts)
     transport_mref = Process.monitor(transport_pid)
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
