@@ -15,7 +15,7 @@ defmodule Phoenix.Channels.GenSocketClient.Transport do
   @type transport_pid :: pid
 
   @doc "Invoked from the socket process to start the transport process."
-  @callback start_link(url::String.t) :: {:ok, transport_pid} | {:error, any}
+  @callback start_link(url::String.t, GenSocketClient.transport_opts) :: {:ok, transport_pid} | {:error, any}
 
   @doc "Invoked to push the frame."
   @callback push(transport_pid, frame) :: :ok
