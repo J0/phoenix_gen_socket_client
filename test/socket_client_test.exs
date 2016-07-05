@@ -145,6 +145,19 @@ defmodule Phoenix.Channels.GenSocketClientTest do
         end)
   end
 
+  test "sends heartbeat messages" do
+    {:ok, socket} = start_socket(url, true, [heartbeat: 100])
+    assert :connected == TestSocket.wait_connect_status(socket)
+    assert {:ok, "phoenix", 2, %{"response" => %{}, "status" => "ok"}} == TestSocket.await_reply(socket, 500)
+    assert {:ok, "phoenix", 3, %{"response" => %{}, "status" => "ok"}} == TestSocket.await_reply(socket, 500)
+  end
+
+  test "disable heartbeat messages" do
+    {:ok, socket} = start_socket(url, true, [heartbeat: nil])
+    assert :connected == TestSocket.wait_connect_status(socket)
+    assert {:error, :timeout} == TestSocket.await_reply(socket, 500)
+  end
+
   defp join_channel do
     assert {:ok, socket} = start_socket()
     assert :connected == TestSocket.wait_connect_status(socket)
@@ -154,8 +167,8 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     %{socket: socket, server_channel: server_channel}
   end
 
-  defp start_socket(url \\ url(), connect \\ true) do
-    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url, connect)
+  defp start_socket(url \\ url(), connect \\ true, socket_opts \\ []) do
+    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url, connect, socket_opts)
   end
 
   defp url(params \\ %{shared_secret: "supersecret"}) do
