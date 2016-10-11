@@ -72,7 +72,5 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   end
 
   @doc false
-  def websocket_terminate(reason, _req, _state) do
-    Logger.info(fn -> "Websocket connection closed with reason #{inspect reason}" end)
-  end
+  def websocket_terminate(_reason, _req, _state), do: :ok
 end
