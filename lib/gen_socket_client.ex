@@ -84,6 +84,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   @type topic :: String.t
   @type event :: String.t
   @type payload :: %{String.t => any}
+  @type out_payload :: %{(String.t | atom) => any}
   @type ref :: pos_integer
   @type message :: %{topic: topic, event: event, payload: payload, ref: ref}
   @type encoded_message :: binary
@@ -151,7 +152,7 @@ defmodule Phoenix.Channels.GenSocketClient do
     do: push(transport, topic, "phx_leave", payload)
 
   @doc "Pushes a message to the topic."
-  @spec push(transport, topic, event, payload) :: {:ok, ref} | {:error, reason::any}
+  @spec push(transport, topic, event, out_payload) :: {:ok, ref} | {:error, reason::any}
   def push(%{transport_pid: nil}, _topic, _event, _payload), do: {:error, :disconnected}
   def push(transport, topic, event, payload) do
     ref = next_ref(topic, transport.message_refs)
