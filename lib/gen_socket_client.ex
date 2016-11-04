@@ -142,12 +142,12 @@ defmodule Phoenix.Channels.GenSocketClient do
   end
 
   @doc "Joins the topic."
-  @spec join(transport, topic, payload) :: {:ok, ref} | {:error, reason::any}
+  @spec join(transport, topic, out_payload) :: {:ok, ref} | {:error, reason::any}
   def join(transport, topic, payload \\ %{}),
     do: push(transport, topic, "phx_join", payload)
 
   @doc "Leaves the topic."
-  @spec leave(transport, topic, payload) :: {:ok, ref} | {:error, reason::any}
+  @spec leave(transport, topic, out_payload) :: {:ok, ref} | {:error, reason::any}
   def leave(transport, topic, payload \\ %{}),
     do: push(transport, topic, "phx_leave", payload)
 
