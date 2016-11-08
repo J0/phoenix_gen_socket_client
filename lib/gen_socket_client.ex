@@ -306,5 +306,5 @@ defmodule Phoenix.Channels.GenSocketClient do
   defp handle_callback_response({:connect, callback_state}, state),
     do: {:noreply, connect(%{state | callback_state: callback_state})}
   defp handle_callback_response({:stop, reason, callback_state}, state),
-    do: {:stop, reason, connect(%{state | callback_state: callback_state})}
+    do: {:stop, reason, %{state | callback_state: callback_state}}
 end
