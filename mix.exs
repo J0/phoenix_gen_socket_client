@@ -1,10 +1,13 @@
 defmodule Phoenix.GenSocketClient.Mixfile do
   use Mix.Project
 
+  @version "0.0.1"
+  @github_url "https://github.com/Aircloak/phoenix_gen_socket_client"
+
   def project do
     [
       app: :phoenix_gen_socket_client,
-      version: "0.0.1",
+      version: @version,
       elixir: "~> 1.2",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
@@ -13,9 +16,12 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       package: package(),
       description: "Socket client behaviour for phoenix channels.",
       docs: [
+        source_url: @github_url,
+        source_ref: "v#{@version}",
         main: "readme",
-        extras: ["README.md"]
-      ]
+        extras: ["README.md"],
+      ],
+      preferred_cli_env: [docs: :docs],
     ]
   end
 
@@ -50,7 +56,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       maintainers: ["Aircloak"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/Aircloak/phoenix_gen_socket_client",
+        "GitHub" => @github_url,
         "Docs" => "http://hexdocs.pm/phoenix_gen_socket_client"
       }
     ]
