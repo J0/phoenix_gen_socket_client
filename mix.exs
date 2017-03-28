@@ -10,6 +10,8 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       deps: deps(),
+      package: package(),
+      description: "Socket client behaviour for phoenix channels.",
       docs: [
         main: "readme",
         extras: ["README.md"]
@@ -42,4 +44,15 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   defp applications(:test), do: [:logger, :websocket_client, :gproc, :cowboy, :phoenix]
   defp applications(:dev), do: [:logger, :websocket_client]
   defp applications(_), do: [:logger]
+
+  defp package do
+    [
+      maintainers: ["Aircloak"],
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/Aircloak/phoenix_gen_socket_client",
+        "Docs" => "http://hexdocs.pm/phoenix_gen_socket_client"
+      }
+    ]
+  end
 end
