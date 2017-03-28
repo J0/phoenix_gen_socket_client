@@ -2,13 +2,15 @@
 
 [![Build
 Status](https://travis-ci.org/Aircloak/phoenix_gen_socket_client.svg?branch=master)](https://travis-ci.org/Aircloak/phoenix_gen_socket_client)
+[![hex.pm](https://img.shields.io/hexpm/v/phoenix_gen_socket_client.svg?style=flat-square)](https://hex.pm/packages/phoenix_gen_socket_client)
+[![hexdocs.pm](https://img.shields.io/badge/docs-latest-green.svg?style=flat-square)](https://hexdocs.pm/phoenix_gen_socket_client/)
 
 This library implements an Elixir client for Phoenix Channels protocol. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
 
 
 ## Status
 
-This library is in a very early alpha, so it's highly unstable and untested. Breaking changes are very likely. Use at your own peril :-)
+This library is continuously used in our system and it's been working for us, so we consider it to be stable :-)
 
 
 ## Prerequisites
@@ -20,13 +22,10 @@ You need to add the project as a dependency to your `mix.exs`:
 def project do
   [
     deps: [
-      {:phoenix_gen_socket_client, github: "aircloak/phoenix_gen_socket_client"}
+      {:phoenix_gen_socket_client, "~> 1.0.0"}
       # ...
     ],
-    application: [
-      applications: [:phoenix_gen_socket_client, # ...],
-      # ...
-    ]
+    # ...
   ]
 end
 ```
@@ -59,7 +58,7 @@ This library is designed for flexibility, so the usage is a bit more involved. I
 2. Start the socket process somewhere in your supervision tree.
 3. Interact with the server from callback functions which are running in the socket process.
 
-A simple demo is available in the [example](example) folder. Here, we'll present some general ideas. For more details, refer to the documentation. It is currently not available online, but you can clone this repo and build it locally with `MIX_ENV=docs mix docs`.
+A simple demo is available in the [example](example) folder. Here, we'll present some general ideas. For more details, refer to the documentation.
 
 __Note__: In the subsequent code snippets we assume that `Phoenix.Channels.GenSocketClient` is aliased, so we use `GenSocketClient`.
 
