@@ -36,7 +36,7 @@ defmodule Example.Mixfile do
       {:phoenix, "~> 1.1.4"},
       {:gettext, "~> 0.9"},
       {:cowboy, "~> 1.0"},
-      {:phoenix_gen_socket_client, "~> 0.0.1"},
+      {:phoenix_gen_socket_client, "~> 1.0.0"},
       {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0"}
     ]
   end

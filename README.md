@@ -22,7 +22,7 @@ You need to add the project as a dependency to your `mix.exs`:
 def project do
   [
     deps: [
-      {:phoenix_gen_socket_client, "~> 0.0.1"}
+      {:phoenix_gen_socket_client, "~> 1.0.0"}
       # ...
     ],
     # ...
