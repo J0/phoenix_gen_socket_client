@@ -2,15 +2,13 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   @moduledoc """
   A simple synchronous Phoenix Channels client.
 
-  This module implements the `Phoenix.Channels.GenSocketClient` behaviour to provide
+  This module can be used in your project for testing your own functionality. The
+  module implements the `Phoenix.Channels.GenSocketClient` behaviour to provide
   a controllable API for channel clients. The implementation is very basic,
   and is useful for tests only. It's not advised to use this module in
   production, because there are various edge cases which can cause subtle
   bugs. You're instead advised to implement your own callback for the
   `Phoenix.Channels.GenSocketClient` behaviour.
-
-  Notice that the module is defined in the lib (and not in the test), which
-  allows us to reuse it in tests of other projects (such as air).
   """
   alias Phoenix.Channels.GenSocketClient
   @behaviour GenSocketClient
