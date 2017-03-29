@@ -55,7 +55,7 @@ This library is designed for flexibility, so the usage is a bit more involved. I
 2. Start the socket process somewhere in your supervision tree.
 3. Interact with the server from callback functions which are running in the socket process.
 
-A simple demo is available in the [example](example) folder. Here, we'll present some general ideas. For more details, refer to the documentation.
+A simple demo is available [here](https://github.com/Aircloak/phoenix_gen_socket_client/tree/master/example). Here, we'll present some general ideas. For more details, refer to the documentation.
 
 __Note__: In the subsequent code snippets we assume that `Phoenix.Channels.GenSocketClient` is aliased, so we use `GenSocketClient`.
 
