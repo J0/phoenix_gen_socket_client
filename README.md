@@ -41,10 +41,7 @@ def project do
 
       # ...
     ],
-    application: [
-      applications: [:websocket_client, # ...],
-      # ...
-    ]
+    # ...
   ]
 end
 ```
