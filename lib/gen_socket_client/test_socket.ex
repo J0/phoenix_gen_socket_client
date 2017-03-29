@@ -9,8 +9,8 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   bugs. You're instead advised to implement your own callback for the
   `Phoenix.Channels.GenSocketClient` behaviour.
 
-  Notice that the module is defined in the lib (and not in the test), which
-  allows us to reuse it in tests of other projects (such as air).
+  The module is defined in the lib (and not in the test) folder, so it can be used
+  in client projects.
   """
   alias Phoenix.Channels.GenSocketClient
   @behaviour GenSocketClient
