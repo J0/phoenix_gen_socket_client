@@ -96,6 +96,21 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     end
   end
 
+  @doc "Pushes a message to the topic."
+  @spec push_without_transport(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload,
+      GenServer.timeout) ::
+    {:ok, GenSocketClient.ref} |
+    {:error, any}
+  def push_without_transport(socket, topic, event, payload \\ %{}, timeout \\ 5000) do
+    send(socket, {:push_without_transport, topic, event, payload})
+
+    receive do
+      {^socket, :push_result, result} -> result
+    after timeout ->
+      {:error, :timeout}
+    end
+  end
+
   @doc "Pushes a message to the topic and awaits the direct response from the server."
   @spec push_sync(GenServer.server, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload,
       GenServer.timeout) ::
@@ -193,6 +208,11 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   end
   def handle_info({:push, topic, event, payload}, transport, client) do
     push_result = GenSocketClient.push(transport, topic, event, payload)
+    send(client, {self(), :push_result, push_result})
+    {:ok, client}
+  end
+  def handle_info({:push_without_transport, topic, event, payload}, _transport, client) do
+    push_result = GenSocketClient.push(topic, event, payload)
     send(client, {self(), :push_result, push_result})
     {:ok, client}
   end

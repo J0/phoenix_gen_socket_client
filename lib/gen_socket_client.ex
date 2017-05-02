@@ -135,10 +135,10 @@ defmodule Phoenix.Channels.GenSocketClient do
   # -------------------------------------------------------------------
 
   @doc "Starts the socket process."
-  @spec start_link(callback::module, transport_mod::module, any, socket_opts, GenServer.options) ::
+  @spec start_link(callback::module, transport_mod::module, any, socket_opts) ::
       GenServer.on_start
-  def start_link(callback, transport_mod, arg, socket_opts \\ [], gen_server_opts \\ []) do
-    GenServer.start_link(__MODULE__, {callback, transport_mod, arg, socket_opts}, gen_server_opts)
+  def start_link(callback, transport_mod, arg, socket_opts \\ []) do
+    GenServer.start_link(__MODULE__, {callback, transport_mod, arg, socket_opts}, name: __MODULE__)
   end
 
   @doc "Joins the topic."
@@ -171,6 +171,11 @@ defmodule Phoenix.Channels.GenSocketClient do
     end
   end
 
+  @doc "Pushes a message to the topic without the need of a transport."
+#  @spec push(topic, event, out_payload) :: {:ok, ref} | {:error, reason::any}
+  def push(topic, event, payload) do
+    GenServer.cast(__MODULE__, {:push, topic, event, payload})
+  end
 
   # -------------------------------------------------------------------
   # API for transport (websocket client)
@@ -230,6 +235,12 @@ defmodule Phoenix.Channels.GenSocketClient do
   end
 
   @doc false
+  def handle_cast({:push, topic, event, payload}, state) do
+    push(transport(state), topic, event, payload)
+    {:noreply, state}
+  end
+
+  @doc false
   def handle_info(
         {:DOWN, transport_mref, :process, _, reason},
         %{transport_mref: transport_mref} = state
@@ -239,7 +250,6 @@ defmodule Phoenix.Channels.GenSocketClient do
   def handle_info(message, state) do
     invoke_callback(state, :handle_info, [message, transport(state)])
   end
-
 
   # -------------------------------------------------------------------
   # Handling of Phoenix messages
