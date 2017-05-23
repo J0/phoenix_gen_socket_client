@@ -36,6 +36,14 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert_receive {TestSite.Channel, {:handle_in, "some_event", %{"foo" => "bar"}}}
   end
 
+  test "client message push without a transport" do
+    assert {:ok, socket} = start_socket()
+    assert :connected == TestSocket.wait_connect_status(socket)
+    assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1", %{"foo" => "bar"})
+    TestSocket.push_without_transport(socket, "channel:1", "some_event", %{"foo" => "bar"})
+    assert_receive {TestSite.Channel, {:handle_in, "some_event", %{"foo" => "bar"}}}
+  end
+
   test "send and response" do
     conn = join_channel()
     {:ok, payload} = TestSocket.push_sync(conn.socket, "channel:1", "sync_event", %{"foo" => "bar"})
