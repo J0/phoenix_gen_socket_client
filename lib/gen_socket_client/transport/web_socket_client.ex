@@ -2,6 +2,14 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   @moduledoc """
   Websocket transport powered by the [websocket_client](https://github.com/sanmiguel/websocket_client)
   library.
+
+  Supported transport options:
+
+    - `keepalive` - Interval in which a ping message is sent to the server to keep the connection alive.
+      By default, Phoenix server will timeout after 60 seconds of inactivity. By providing a keepalive value
+      which is less than the server timeout, you can ensure that the connection remains open, even if  no
+      messages are being passed between the client and the server. If you don't want to disable this mechanism,
+      you can pass `nil`. If this option is not provided, the default value of 30 seconds is used.
   """
   @behaviour Phoenix.Channels.GenSocketClient.Transport
   @behaviour :websocket_client
@@ -35,7 +43,7 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
 
   @doc false
   def init([socket, transport_options]) do
-    {:once, %{socket: socket, keepalive: transport_options[:keepalive]}}
+    {:once, %{socket: socket, keepalive: Keyword.get(transport_options, :keepalive, :timer.seconds(30))}}
   end
 
   @doc false
