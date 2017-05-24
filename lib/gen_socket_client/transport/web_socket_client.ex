@@ -2,6 +2,11 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   @moduledoc """
   Websocket transport powered by the [websocket_client](https://github.com/sanmiguel/websocket_client)
   library.
+
+  Supported transport options:
+
+    - `keepalive` - Interval in which a ping message is sent to the server to keep the connection alive.
+      Defaults to 30 seconds.
   """
   @behaviour Phoenix.Channels.GenSocketClient.Transport
   @behaviour :websocket_client
@@ -35,7 +40,7 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
 
   @doc false
   def init([socket, transport_options]) do
-    {:once, %{socket: socket, keepalive: transport_options[:keepalive]}}
+    {:once, %{socket: socket, keepalive: Keyword.get(transport_options, :keepalive, :timer.seconds(30))}}
   end
 
   @doc false
