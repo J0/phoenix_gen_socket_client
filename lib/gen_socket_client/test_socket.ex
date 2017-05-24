@@ -107,7 +107,7 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
 
   @doc "Awaits a message from the socket."
   @spec await_message(GenServer.server, GenServer.timeout) ::
-    {:ok, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload} | {:error, :timeout}
+    {:ok, GenSocketClient.payload} | {:error, :timeout}
   def await_message(socket, timeout \\ 5000) do
     receive do
       {^socket, :message, message} -> {:ok, message}
@@ -116,6 +116,17 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     end
   end
 
+
+  @doc "Awaits a reply from the socket."
+  @spec await_reply(GenServer.server, GenServer.timeout) ::
+    {:ok, GenSocketClient.topic, GenSocketClient.event, GenSocketClient.payload} | {:error, :timeout}
+  def await_reply(socket, timeout \\ 5000) do
+    receive do
+      {^socket, :reply, topic, ref, payload} -> {:ok, topic, ref, payload}
+    after timeout ->
+      {:error, :timeout}
+    end
+  end
 
   # -------------------------------------------------------------------
   # Channels.Client.GenSocketClient callbacks

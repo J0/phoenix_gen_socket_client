@@ -72,7 +72,8 @@ defmodule Phoenix.Channels.GenSocketClient do
   @type transport_opts :: any
   @type socket_opts :: [
     serializer: module,
-    transport_opts: transport_opts
+    transport_opts: transport_opts,
+    heartbeat: integer | nil
   ]
   @type callback_state :: any
   @opaque transport :: %{
@@ -171,8 +172,8 @@ defmodule Phoenix.Channels.GenSocketClient do
   def push(transport, topic, event, payload) do
     ref = next_ref(topic, transport.message_refs)
     cond do
-      # first message on a channel must always be a join
-      event != "phx_join" and ref == 1 ->
+      # first message on a channel must always be a join except for system messages (heartbeat)
+      event != "phx_join" and ref == 1 and topic != "phoenix" ->
         :ets.delete(transport.message_refs, topic)
         {:error, :not_joined}
       # join must always be a first message
@@ -224,6 +225,7 @@ defmodule Phoenix.Channels.GenSocketClient do
             transport_mod: transport_mod,
             transport_opts: Keyword.get(socket_opts, :transport_opts, []),
             serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
+            heartbeat: Keyword.get(socket_opts, :heartbeat, 30_000),
             callback: callback,
             callback_state: callback_state,
             transport_pid: nil,
@@ -245,6 +247,12 @@ defmodule Phoenix.Channels.GenSocketClient do
   def handle_cast({:notify_message, encoded_message}, state) do
     decoded_message = state.serializer.decode_message(encoded_message)
     handle_message(decoded_message, state)
+  end
+
+  def handle_info(:heartbeat, %{heartbeat: heartbeat} = state) do
+    push(transport(state), "phoenix", "heartbeat", %{})
+    :erlang.send_after(heartbeat, self(), :heartbeat)
+    {:noreply, state}
   end
 
   @doc false
@@ -314,9 +322,10 @@ defmodule Phoenix.Channels.GenSocketClient do
   defp maybe_connect(:connect, state), do: connect(state)
   defp maybe_connect(:noconnect, state), do: state
 
-  defp connect(%{transport_pid: nil} = state) do
+  defp connect(%{transport_pid: nil, heartbeat: heartbeat} = state) do
     {:ok, transport_pid} = state.transport_mod.start_link(state.url, state.transport_opts)
     transport_mref = Process.monitor(transport_pid)
+    if (heartbeat != nil), do: :erlang.send_after(heartbeat, self(), :heartbeat)
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
 

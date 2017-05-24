@@ -69,7 +69,7 @@ GenSocketClient.start_link(
   callback_module,
   transport_module,
   arbitrary_argument,
-  socket_opts, # defaults to []
+  socket_opts, # defaults to [heartbeat: 30_000]
   gen_server_opts # defaults to []
 )
 ```
