@@ -87,13 +87,7 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     {:ok, GenSocketClient.ref} |
     {:error, any}
   def push(socket, topic, event, payload \\ %{}, timeout \\ 5000) do
-    send(socket, {:push, topic, event, payload})
-
-    receive do
-      {^socket, :push_result, result} -> result
-    after timeout ->
-      {:error, :timeout}
-    end
+    GenSocketClient.call(socket, {:push, topic, event, payload}, timeout)
   end
 
   @doc "Pushes a message to the topic and awaits the direct response from the server."
@@ -191,9 +185,10 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     end
     {:ok, client}
   end
-  def handle_info({:push, topic, event, payload}, transport, client) do
+
+  @doc false
+  def handle_call({:push, topic, event, payload}, _from, transport, client) do
     push_result = GenSocketClient.push(transport, topic, event, payload)
-    send(client, {self(), :push_result, push_result})
-    {:ok, client}
+    {:reply, push_result, client}
   end
 end

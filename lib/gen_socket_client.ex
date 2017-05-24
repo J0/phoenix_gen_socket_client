@@ -129,6 +129,15 @@ defmodule Phoenix.Channels.GenSocketClient do
   @doc "Invoked to handle an Erlang message."
   @callback handle_info(message::any, transport, callback_state) :: handler_response
 
+  @doc "Invoked to handle a synchronous call."
+  @callback handle_call(message::any, GenServer.from, transport, callback_state) ::
+    {:reply, reply, new_state} |
+    {:reply, reply, new_state, timeout | :hibernate} |
+    {:noreply, new_state} |
+    {:noreply, new_state, timeout | :hibernate} |
+    {:stop, reason, reply, new_state} |
+    {:stop, reason, new_state} when new_state: callback_state, reply: term, reason: term
+
 
   # -------------------------------------------------------------------
   # API functions
@@ -140,6 +149,11 @@ defmodule Phoenix.Channels.GenSocketClient do
   def start_link(callback, transport_mod, arg, socket_opts \\ [], gen_server_opts \\ []) do
     GenServer.start_link(__MODULE__, {callback, transport_mod, arg, socket_opts}, gen_server_opts)
   end
+
+  @doc "Makes a synchronous call to the server and waits for its reply."
+  @spec call(GenServer.server, any, non_neg_integer) :: any
+  def call(server, request, timeout \\ 5000), do:
+    GenServer.call(server, {__MODULE__, :call, request}, timeout)
 
   @doc "Joins the topic."
   @spec join(transport, topic, out_payload) :: {:ok, ref} | {:error, reason::any}
@@ -170,6 +184,10 @@ defmodule Phoenix.Channels.GenSocketClient do
         {:ok, ref}
     end
   end
+
+  @doc "Can be invoked to send a response to the client."
+  @spec reply(GenServer.from, any) :: :ok
+  defdelegate reply(from, response), to: GenServer
 
 
   # -------------------------------------------------------------------
@@ -227,6 +245,24 @@ defmodule Phoenix.Channels.GenSocketClient do
   def handle_cast({:notify_message, encoded_message}, state) do
     decoded_message = state.serializer.decode_message(encoded_message)
     handle_message(decoded_message, state)
+  end
+
+  @doc false
+  def handle_call({__MODULE__, :call, request}, from, state) do
+    case state.callback.handle_call(request, from, transport(state), state.callback_state) do
+      {:reply, reply, callback_state} ->
+        {:reply, reply, %{state | callback_state: callback_state}}
+      {:reply, reply, callback_state, timeout} ->
+        {:reply, reply, %{state | callback_state: callback_state}, timeout}
+      {:noreply, callback_state} ->
+        {:noreply, %{state | callback_state: callback_state}}
+      {:noreply, callback_state, timeout} ->
+        {:noreply, %{state | callback_state: callback_state}, timeout}
+      {:stop, reason, callback_state} ->
+        {:stop, reason, %{state | callback_state: callback_state}}
+      {:stop, reason, reply, callback_state} ->
+        {:stop, reason, reply, %{state | callback_state: callback_state}}
+    end
   end
 
   @doc false
