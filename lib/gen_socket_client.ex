@@ -182,7 +182,7 @@ defmodule Phoenix.Channels.GenSocketClient do
           {:ok, encoded} ->
             transport.transport_mod.push(transport.transport_pid, encoded)
             {:ok, ref}
-          _error -> {:error, :encoding_error}
+          {:error, error} -> {:error, {:encoding_error, error}}
         end
     end
   end

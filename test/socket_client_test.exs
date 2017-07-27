@@ -44,7 +44,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "sending a mesasge that cannot be encoded" do
     conn = join_channel()
-    assert {:error, :encoding_error} =
+    assert {:error, {:encoding_error, {:invalid, <<166>>}}} =
       TestSocket.push_sync(conn.socket, "channel:1", "sync_event", %{"foo" => _invalid_string = <<166>>})
   end
 
