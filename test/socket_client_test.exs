@@ -42,6 +42,12 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert %{"status" => "ok", "response" => %{"foo" => "bar"}} = payload
   end
 
+  test "sending a mesasge that cannot be encoded" do
+    conn = join_channel()
+    assert {:error, {:invalid, <<166>>}} =
+      TestSocket.push_sync(conn.socket, "channel:1", "sync_event", %{"foo" => _invalid_string = <<166>>})
+  end
+
   test "client message receive" do
     conn = join_channel()
     send(conn.server_channel, {:push, "some_event", %{"foo" => "bar"}})
