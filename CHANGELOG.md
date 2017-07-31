@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Serialization failures are propagated as tuples instead of exceptions
+
 ## 1.1.1
 
 - Changed the internals to simplify creating a large number of open connections.
