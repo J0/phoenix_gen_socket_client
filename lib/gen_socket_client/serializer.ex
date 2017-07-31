@@ -9,7 +9,8 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer do
   @callback decode_message(GenSocketClient.encoded_message) :: GenSocketClient.message
 
   @doc "Invoked to encode a socket message."
-  @callback encode_message(GenSocketClient.message) :: Phoenix.Channels.GenSocketClient.Transport.frame
+  @callback encode_message(GenSocketClient.message) ::
+    {:ok, Phoenix.Channels.GenSocketClient.Transport.frame} | {:error, reason :: any}
 end
 
 defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
@@ -31,7 +32,10 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
 
   @doc false
   def encode_message(message) do
-    {:binary, Poison.encode!(message)}
+    case Poison.encode(message) do
+      {:ok, encoded} -> {:ok, {:binary, encoded}}
+      error -> error
+    end
   end
 end
 
@@ -56,6 +60,9 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.GzipJson do
 
   @doc false
   def encode_message(message) do
-    {:binary, message |> Poison.encode_to_iodata!() |> :zlib.gzip}
+    case Poison.encode_to_iodata(message) do
+      {:ok, encoded} -> {:ok, {:binary, :zlib.gzip(encoded)}}
+      error -> error
+    end
   end
 end

@@ -178,9 +178,12 @@ defmodule Phoenix.Channels.GenSocketClient do
       event == "phx_join" and ref > 1 ->
         {:error, :already_joined}
       true ->
-        frame = transport.serializer.encode_message(%{topic: topic, event: event, payload: payload, ref: ref})
-        transport.transport_mod.push(transport.transport_pid, frame)
-        {:ok, ref}
+        case transport.serializer.encode_message(%{topic: topic, event: event, payload: payload, ref: ref}) do
+          {:ok, encoded} ->
+            transport.transport_mod.push(transport.transport_pid, encoded)
+            {:ok, ref}
+          {:error, error} -> {:error, {:encoding_error, error}}
+        end
     end
   end
 
