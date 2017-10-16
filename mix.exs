@@ -26,7 +26,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   end
 
   def application do
-    [applications: applications(Mix.env)]
+    [extra_applications: [:logger]]
   end
 
   defp deps do
@@ -44,10 +44,6 @@ defmodule Phoenix.GenSocketClient.Mixfile do
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
-
-  defp applications(:test), do: [:logger, :websocket_client, :cowboy, :phoenix]
-  defp applications(:dev), do: [:logger, :websocket_client]
-  defp applications(_), do: [:logger]
 
   defp package do
     [
