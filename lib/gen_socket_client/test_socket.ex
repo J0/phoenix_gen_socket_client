@@ -19,9 +19,10 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   # -------------------------------------------------------------------
 
   @doc "Starts the driver process."
-  @spec start_link(module, String.t, boolean, GenSocketClient.socket_opts) :: GenServer.on_start
-  def start_link(transport, url, connect \\ true, socket_opts \\ []),
-    do: GenSocketClient.start_link(__MODULE__, transport, {url, connect, self()}, socket_opts)
+  @spec start_link(module, String.t, GenSocketClient.query_params, boolean, GenSocketClient.socket_opts) ::
+    GenServer.on_start
+  def start_link(transport, url, query_params, connect \\ true, socket_opts \\ []),
+    do: GenSocketClient.start_link(__MODULE__, transport, {url, query_params, connect, self()}, socket_opts)
 
   @doc "Connect to the server."
   @spec connect(GenServer.server) :: :ok
@@ -122,8 +123,8 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   # -------------------------------------------------------------------
 
   @doc false
-  def init({url, true, client}), do: {:connect, url, client}
-  def init({url, false, client}), do: {:noconnect, url, client}
+  def init({url, query_params, true, client}), do: {:connect, url, query_params, client}
+  def init({url, query_params, false, client}), do: {:noconnect, url, query_params, client}
 
   @doc false
   def handle_connected(_transport, client) do

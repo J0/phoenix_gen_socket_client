@@ -21,7 +21,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
   end
 
   test "no auto connect" do
-    assert {:ok, socket} = start_socket(url(), false)
+    assert {:ok, socket} = start_socket(url(), query_params(), false)
     refute :connected == TestSocket.wait_connect_status(socket, 100)
     TestSocket.connect(socket)
     assert :connected == TestSocket.wait_connect_status(socket)
@@ -84,7 +84,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
   end
 
   test "connection refused by socket" do
-    assert {:ok, socket} = start_socket(url(%{shared_secret: "invalid_secret"}))
+    assert {:ok, socket} = start_socket(url(), shared_secret: "invalid_secret")
     assert {:disconnected, {403, "Forbidden"}} == TestSocket.wait_connect_status(socket)
   end
 
@@ -160,13 +160,14 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     %{socket: socket, server_channel: server_channel}
   end
 
-  defp start_socket(url \\ url(), connect \\ true) do
-    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url, connect)
-  end
+  defp start_socket(url \\ url(), query_params \\ query_params(), connect \\ true), do:
+    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url, query_params, connect)
 
-  defp url(params \\ %{shared_secret: "supersecret"}) do
-    "#{Endpoint.url()}/test_socket/websocket?#{URI.encode_query(params)}"
+  defp url() do
+    "#{Endpoint.url()}/test_socket/websocket"
     |> String.replace(~r(http://), "ws://")
     |> String.replace(~r(https://), "wss://")
   end
+
+  defp query_params(), do: [{"shared_secret", "supersecret"}]
 end

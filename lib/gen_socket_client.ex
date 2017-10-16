@@ -91,11 +91,12 @@ defmodule Phoenix.Channels.GenSocketClient do
     {:ok, callback_state} |
     {:connect, callback_state} |
     {:stop, reason::any, callback_state}
+  @type query_params :: [{String.t, String.t}]
 
   @doc "Invoked when the process is created."
   @callback init(arg::any) ::
-    {:connect, url::String.t, callback_state} |
-    {:noconnect, url::String.t, callback_state} |
+    {:connect, url::String.t, query_params, callback_state} |
+    {:noconnect, url::String.t, query_params, callback_state} |
     :ignore |
     {:error, reason::any}
 
@@ -219,10 +220,11 @@ defmodule Phoenix.Channels.GenSocketClient do
   @doc false
   def init({callback, transport_mod, arg, socket_opts}) do
     case callback.init(arg) do
-      {action, url, callback_state} when action in [:connect, :noconnect] ->
+      {action, url, query_params, callback_state} when action in [:connect, :noconnect] ->
         {:ok,
           maybe_connect(action, %{
             url: url,
+            query_params: query_params,
             transport_mod: transport_mod,
             transport_opts: Keyword.get(socket_opts, :transport_opts, []),
             serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
@@ -316,10 +318,17 @@ defmodule Phoenix.Channels.GenSocketClient do
   defp maybe_connect(:noconnect, state), do: state
 
   defp connect(%{transport_pid: nil} = state) do
-    {:ok, transport_pid} = state.transport_mod.start_link(state.url, state.transport_opts)
+    unless is_nil(URI.parse(state.url).query) do
+      raise ArgumentError, "query parameters must be passed as a keyword list from the `init/1` callback"
+    end
+
+    {:ok, transport_pid} = state.transport_mod.start_link(url(state), state.transport_opts)
     transport_mref = Process.monitor(transport_pid)
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
+
+  defp url(state), do:
+    "#{state.url}?#{URI.encode_query(state.query_params)}"
 
   defp reinit(state) do
     Process.get_keys()

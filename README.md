@@ -83,13 +83,13 @@ The socket url must also include the transport suffix. For example, if in the se
 
 ### Connection life-cycle
 
-If `init/1` returns `{:connect, url, initial_state}`, the connection will be established immediately. The connection is established in a separate process, which we call the _transport process_. This process is the immediate child of the socket process. Consequently, all communication takes place concurrently to the socket process. If you handle some Erlang messages in the socket process, you may need to keep track of whether you're connected or not.
+If `init/1` returns `{:connect, url, query_params, initial_state}`, the connection will be established immediately. The connection is established in a separate process, which we call the _transport process_. This process is the immediate child of the socket process. Consequently, all communication takes place concurrently to the socket process. If you handle some Erlang messages in the socket process, you may need to keep track of whether you're connected or not.
 
 If the connection is established, the `handle_connected/2` callback will be invoked. If establishing of the connection fails, `handle_disconnected/2` callback is invoked. The same callback is invoked if the established connection is lost.
 
 If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple.
 
-Finally, you can also decide to connect at some later time by returning `{:noconnect, url, state}` from the `init/1` callback. To connect later, you need to send an Erlang message to the socket process, and return `{:connect, state}` tuple.
+Finally, you can also decide to connect at some later time by returning `{:noconnect, url, query_params, state}` from the `init/1` callback. To connect later, you need to send an Erlang message to the socket process, and return `{:connect, state}` tuple.
 
 Though somewhat elaborate, this approach has following benefits:
 
