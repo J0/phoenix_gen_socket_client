@@ -35,7 +35,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       {:dialyze, "~> 0.2.1", only: :dev},
       {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4",
         only: [:dev, :test, :docs]},
-      {:poison, "~> 2.0", only: :test},
+      {:poison, "~> 2.0", only: [:dev, :test]},
       {:phoenix, "~> 1.3", only: :test},
       {:cowboy, "~> 1.0", only: :test},
       {:gproc, "~> 0.5.0", only: :test},
