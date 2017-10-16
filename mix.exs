@@ -38,7 +38,6 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       {:poison, "~> 2.0", only: [:dev, :test]},
       {:phoenix, "~> 1.3", only: :test},
       {:cowboy, "~> 1.0", only: :test},
-      {:gproc, "~> 0.5.0", only: :test},
       {:ex_doc, "~> 0.17.1", only: :docs}
     ]
   end
@@ -46,7 +45,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
-  defp applications(:test), do: [:logger, :websocket_client, :gproc, :cowboy, :phoenix]
+  defp applications(:test), do: [:logger, :websocket_client, :cowboy, :phoenix]
   defp applications(:dev), do: [:logger, :websocket_client]
   defp applications(_), do: [:logger]
 
