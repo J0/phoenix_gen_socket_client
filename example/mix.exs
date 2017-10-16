@@ -34,7 +34,9 @@ defmodule Example.Mixfile do
       {:phoenix, "~> 1.3.0"},
       {:gettext, "~> 0.9"},
       {:cowboy, "~> 1.0"},
-      {:phoenix_gen_socket_client, "~> 1.0.0"},
+      # Note: we're using a local dependency here to keep this project in sync with the repo state.
+      # In regular production you should use the latest published hex version.
+      {:phoenix_gen_socket_client, path: "../"},
       {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4"}
     ]
   end
