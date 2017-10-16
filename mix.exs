@@ -39,8 +39,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       {:phoenix, "~> 1.3", only: :test},
       {:cowboy, "~> 1.0", only: :test},
       {:gproc, "~> 0.5.0", only: :test},
-      {:ex_doc, "~> 0.11", only: :docs},
-      {:earmark, "~> 0.2", only: :docs}
+      {:ex_doc, "~> 0.17.1", only: :docs}
     ]
   end
 
