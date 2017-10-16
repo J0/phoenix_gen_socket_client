@@ -1,9 +1,9 @@
 sudo: false
 language: elixir
 elixir:
-  - 1.2.3
+  - 1.5
 otp_release:
-  - 18.2.1
+  - 20.0
 env:
   global:
     - MIX_HOME=$(pwd)/.mix
