@@ -1,7 +1,7 @@
-defmodule Example.Endpoint do
+defmodule ExampleWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :example
 
-  socket "/socket", Example.UserSocket
+  socket "/socket", ExampleWeb.UserSocket
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -33,5 +33,5 @@ defmodule Example.Endpoint do
     key: "_example_key",
     signing_salt: "dnv9qTI7"
 
-  plug Example.Router
+  plug ExampleWeb.Router
 end

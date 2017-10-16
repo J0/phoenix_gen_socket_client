@@ -1,11 +1,11 @@
-defmodule Example.Router do
-  use Example.Web, :router
+defmodule ExampleWeb.Router do
+  use ExampleWeb, :router
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  scope "/api", Example do
+  scope "/api", ExampleWeb do
     pipe_through :api
   end
 end

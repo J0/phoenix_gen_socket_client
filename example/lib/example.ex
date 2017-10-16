@@ -8,7 +8,7 @@ defmodule Example do
 
     children = [
       # Start the endpoint when the application starts
-      supervisor(Example.Endpoint, []),
+      supervisor(ExampleWeb.Endpoint, []),
       worker(Example.SocketClient, [])
     ]
 

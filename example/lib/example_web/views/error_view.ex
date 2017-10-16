@@ -1,5 +1,5 @@
-defmodule Example.ErrorView do
-  use Example.Web, :view
+defmodule ExampleWeb.ErrorView do
+  use ExampleWeb, :view
 
   def render("404.json", _assigns) do
     %{errors: %{detail: "Page not found"}}
