@@ -4,8 +4,8 @@ defmodule TestSite do
 
     socket "/test_socket", TestSite.Socket
 
-    defoverridable start_link: 0
-    def start_link do
+    defoverridable start_link: 1
+    def start_link(arg) do
       Application.put_env(:aircloak_common, __MODULE__, [
             https: false,
             http: [port: 29876],
@@ -15,7 +15,7 @@ defmodule TestSite do
             pubsub: [adapter: Phoenix.PubSub.PG2, name: __MODULE__]
           ])
 
-      super()
+      super(arg)
     end
   end
 
