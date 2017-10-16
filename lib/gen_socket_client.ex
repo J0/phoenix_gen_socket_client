@@ -224,7 +224,7 @@ defmodule Phoenix.Channels.GenSocketClient do
         {:ok,
           maybe_connect(action, %{
             url: url,
-            query_params: query_params,
+            query_params: Enum.uniq_by(query_params ++ [{"vsn", "1.0.0"}], &elem(&1, 0)),
             transport_mod: transport_mod,
             transport_opts: Keyword.get(socket_opts, :transport_opts, []),
             serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
