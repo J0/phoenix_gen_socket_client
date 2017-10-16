@@ -1,21 +1,21 @@
 defmodule TestSite do
   defmodule Endpoint do
-    use Phoenix.Endpoint, otp_app: :aircloak_common
+    use Phoenix.Endpoint, otp_app: :phoenix_gen_socket_client
 
     socket "/test_socket", TestSite.Socket
 
-    defoverridable start_link: 1
-    def start_link(arg) do
-      Application.put_env(:aircloak_common, __MODULE__, [
-            https: false,
-            http: [port: 29876],
-            secret_key_base: String.duplicate("abcdefgh", 8),
-            debug_errors: false,
-            server: true,
-            pubsub: [adapter: Phoenix.PubSub.PG2, name: __MODULE__]
-          ])
-
-      super(arg)
+    @doc false
+    def init(:supervisor, config) do
+      {:ok,
+        Keyword.merge(config,
+          https: false,
+          http: [port: 29876],
+          secret_key_base: String.duplicate("abcdefgh", 8),
+          debug_errors: false,
+          server: true,
+          pubsub: [adapter: Phoenix.PubSub.PG2, name: __MODULE__]
+        )
+      }
     end
   end
 
