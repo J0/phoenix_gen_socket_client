@@ -85,7 +85,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   @type payload :: %{String.t => any}
   @type out_payload :: %{(String.t | atom) => any}
   @type ref :: pos_integer
-  @type message :: %{topic: topic, event: event, payload: payload, ref: ref}
+  @type message :: term
   @type encoded_message :: binary
   @type handler_response ::
     {:ok, callback_state} |
@@ -169,17 +169,16 @@ defmodule Phoenix.Channels.GenSocketClient do
   @spec push(transport, topic, event, out_payload) :: {:ok, ref} | {:error, reason::any}
   def push(%{transport_pid: nil}, _topic, _event, _payload), do: {:error, :disconnected}
   def push(transport, topic, event, payload) do
-    ref = next_ref(topic)
     cond do
       # first message on a channel must always be a join
-      event != "phx_join" and ref == 1 ->
-        Process.delete({__MODULE__, topic})
+      event != "phx_join" and join_ref(topic) == nil ->
         {:error, :not_joined}
       # join must always be a first message
-      event == "phx_join" and ref > 1 ->
+      event == "phx_join" and join_ref(topic) != nil ->
         {:error, :already_joined}
       true ->
-        case transport.serializer.encode_message(%{topic: topic, event: event, payload: payload, ref: ref}) do
+        {join_ref, ref} = next_ref(event, topic)
+        case transport.serializer.encode_message([join_ref, ref, topic, event, payload]) do
           {:ok, encoded} ->
             transport.transport_mod.push(transport.transport_pid, encoded)
             {:ok, ref}
@@ -224,7 +223,7 @@ defmodule Phoenix.Channels.GenSocketClient do
         {:ok,
           maybe_connect(action, %{
             url: url,
-            query_params: Enum.uniq_by(query_params ++ [{"vsn", "1.0.0"}], &elem(&1, 0)),
+            query_params: Enum.uniq_by(query_params ++ [{"vsn", "2.0.0"}], &elem(&1, 0)),
             transport_mod: transport_mod,
             transport_opts: Keyword.get(socket_opts, :transport_opts, []),
             serializer: Keyword.get(socket_opts, :serializer, Phoenix.Channels.GenSocketClient.Serializer.Json),
@@ -285,29 +284,44 @@ defmodule Phoenix.Channels.GenSocketClient do
   # -------------------------------------------------------------------
 
   # server replied to a join message (recognized by ref 1 which is the first message on the topic)
-  defp handle_message(%{event: "phx_reply", ref: 1, payload: payload, topic: topic}, state) do
+  defp handle_message(message, state) do
+    [join_ref, ref, topic, event, payload] = message
+    cond do
+      event == "phx_reply" and join_ref in [ref, nil] ->
+        handle_join_reply(join_ref, topic, payload, state)
+      join_ref != join_ref(topic) and event in ["phx_reply", "phx_close", "phx_error"] ->
+        {:noreply, state}
+      event == "phx_reply" ->
+        handle_reply(ref, topic, payload, state)
+      event in ["phx_close", "phx_error"] ->
+        handle_channel_closed(topic, payload, state)
+      true ->
+        handle_server_message(topic, event, payload, state)
+    end
+  end
+
+  defp handle_join_reply(join_ref, topic, payload, state) do
     case payload["status"] do
       "ok" ->
+        store_join_ref(topic, join_ref)
         invoke_callback(state, :handle_joined, [topic, payload["response"], transport(state)])
       "error" ->
-        Process.delete({__MODULE__, topic})
         invoke_callback(state, :handle_join_error, [topic, payload["response"], transport(state)])
     end
   end
+
   # server replied to a non-join message
-  defp handle_message(%{event: "phx_reply", ref: ref, payload: payload, topic: topic}, state) do
+  defp handle_reply(ref, topic, payload, state), do:
     invoke_callback(state, :handle_reply, [topic, ref, payload, transport(state)])
-  end
+
   # channel has been closed (phx_close) or crashed (phx_error) on the server
-  defp handle_message(%{event: event, payload: payload, topic: topic}, state)
-      when event in ["phx_close", "phx_error"] do
-    Process.delete({__MODULE__, topic})
+  defp handle_channel_closed(topic, payload, state) do
+    delete_join_ref(topic)
     invoke_callback(state, :handle_channel_closed, [topic, payload, transport(state)])
   end
-  # other messages from the server
-  defp handle_message(%{event: event, payload: payload, topic: topic}, state) do
+
+  defp handle_server_message(topic, event, payload, state), do:
     invoke_callback(state, :handle_message, [topic, event, payload, transport(state)])
-  end
 
 
   # -------------------------------------------------------------------
@@ -342,11 +356,23 @@ defmodule Phoenix.Channels.GenSocketClient do
   defp transport(state),
     do: Map.take(state, [:transport_mod, :transport_pid, :serializer])
 
-  defp next_ref(topic) do
-    ref = Process.get({__MODULE__, topic}, 0) + 1
-    Process.put({__MODULE__, topic}, ref)
-    ref
+  defp next_ref(event, topic) do
+    ref = Process.get({__MODULE__, :ref}, 0) + 1
+    Process.put({__MODULE__, :ref}, ref)
+
+    join_ref = if event == "phx_join", do: ref, else: join_ref(topic)
+
+    {join_ref, ref}
   end
+
+  defp store_join_ref(topic, join_ref), do:
+    Process.put({__MODULE__, {:join_ref, topic}}, join_ref)
+
+  defp join_ref(topic), do:
+    Process.get({__MODULE__, {:join_ref, topic}})
+
+  defp delete_join_ref(topic), do:
+    Process.delete({__MODULE__, {:join_ref, topic}})
 
   defp invoke_callback(state, function, args) do
     callback_response = apply(state.callback, function, args ++ [state.callback_state])

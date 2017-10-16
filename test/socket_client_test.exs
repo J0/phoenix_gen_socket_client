@@ -64,18 +64,18 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     conn = join_channel()
     assert {:ok, _} = TestSocket.join(conn.socket, "channel:2")
 
-    assert {:ok, 2} == TestSocket.push(conn.socket, "channel:1", "some_event")
-    assert {:ok, 3} == TestSocket.push(conn.socket, "channel:1", "another_event")
-    assert {:ok, 2} == TestSocket.push(conn.socket, "channel:2", "channel_2_event")
-    assert {:ok, 4} == TestSocket.push(conn.socket, "channel:1", "yet_another_event")
+    assert {:ok, 3} == TestSocket.push(conn.socket, "channel:1", "some_event")
+    assert {:ok, 4} == TestSocket.push(conn.socket, "channel:1", "another_event")
+    assert {:ok, 5} == TestSocket.push(conn.socket, "channel:2", "channel_2_event")
+    assert {:ok, 6} == TestSocket.push(conn.socket, "channel:1", "yet_another_event")
 
     # leave and rejoin the channel, and verify that counter has been reset
     assert {:ok, %{}} == TestSocket.leave(conn.socket, "channel:1")
     TestSocket.join(conn.socket, "channel:1")
-    assert {:ok, 2} == TestSocket.push(conn.socket, "channel:1", "some_event")
+    assert {:ok, 9} == TestSocket.push(conn.socket, "channel:1", "some_event")
 
     # the other channel counter should not be reset
-    assert {:ok, 3} == TestSocket.push(conn.socket, "channel:2", "channel_2_second_event")
+    assert {:ok, 10} == TestSocket.push(conn.socket, "channel:2", "channel_2_second_event")
   end
 
   test "connection error" do
