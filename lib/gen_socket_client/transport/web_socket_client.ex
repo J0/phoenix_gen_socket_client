@@ -26,7 +26,7 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   @doc false
   def start_link(url, transport_options) do
     url
-    |> to_char_list()
+    |> to_charlist()
     |> :websocket_client.start_link(__MODULE__, [self(), transport_options])
   end
 
