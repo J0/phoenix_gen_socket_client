@@ -14,6 +14,7 @@ cache:
 install:
   - mkdir -p $MIX_HOME
   - mix local.hex --force
+  - mix local.rebar --force
 before_script:
   - mix deps.get
   - mix compile --warnings-as-errors
