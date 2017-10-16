@@ -5,7 +5,9 @@ Status](https://travis-ci.org/Aircloak/phoenix_gen_socket_client.svg?branch=mast
 [![hex.pm](https://img.shields.io/hexpm/v/phoenix_gen_socket_client.svg?style=flat-square)](https://hex.pm/packages/phoenix_gen_socket_client)
 [![hexdocs.pm](https://img.shields.io/badge/docs-latest-green.svg?style=flat-square)](https://hexdocs.pm/phoenix_gen_socket_client/)
 
-This library implements an Elixir client for Phoenix Channels protocol. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
+This library implements an Elixir client for Phoenix Channels protocol 2.x. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
+
+__NOTE__: the latest version of this library supports only the version 2.0 of the channels protocol (used on Phoenix 1.3 or later). If you need to use the version 1.0 of the protocol, you need to use [the older version of this library](https://hex.pm/packages/phoenix_gen_socket_client/1.2.0).
 
 
 ## Status
@@ -22,7 +24,7 @@ You need to add the project as a dependency to your `mix.exs`:
 def project do
   [
     deps: [
-      {:phoenix_gen_socket_client, "~> 1.1.1"}
+      {:phoenix_gen_socket_client, "~> 2.0.0"}
       # ...
     ],
     # ...
@@ -36,8 +38,8 @@ You also need to add the transport (e.g. a websocket client), and serializer (e.
 def project do
   [
     deps: [
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0"},
-      {:poison, "~> 1.5.2"}
+      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4"},
+      {:poison, "~> 2.0"}
 
       # ...
     ],

@@ -1,7 +1,7 @@
 defmodule Phoenix.GenSocketClient.Mixfile do
   use Mix.Project
 
-  @version "1.2.0"
+  @version "2.0.0"
   @github_url "https://github.com/Aircloak/phoenix_gen_socket_client"
 
   def project do
