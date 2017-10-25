@@ -38,7 +38,7 @@ You also need to add the transport (e.g. a websocket client), and serializer (e.
 def project do
   [
     deps: [
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4"},
+      {:websocket_client, "~> 1.2"},
       {:poison, "~> 2.0"}
 
       # ...

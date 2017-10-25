@@ -3,7 +3,7 @@
 - requires Elixir 1.5 or greater
 - supports only Phoenix channels protocol 2.0 (so the library works only with Phoenix 1.3+ on sockets which are powered by 2.0 serializers)
 - takes URL parameters separately (see spec for `Phoenix.Channels.GenSocketClient.init/1` and `Phoenix.Channels.GenSocketClient.TestSocket.start_link/1`)
-- properly enforces optional dependencies (Poison and sanmiguel/websocket_client)
+- properly enforces optional dependencies (Poison and websocket_client)
 
 ## 1.2.0
 
