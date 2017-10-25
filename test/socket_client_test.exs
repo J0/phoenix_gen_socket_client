@@ -69,12 +69,11 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert {:ok, 5} == TestSocket.push(conn.socket, "channel:2", "channel_2_event")
     assert {:ok, 6} == TestSocket.push(conn.socket, "channel:1", "yet_another_event")
 
-    # leave and rejoin the channel, and verify that counter has been reset
+    # leave and rejoin the channel
     assert {:ok, %{}} == TestSocket.leave(conn.socket, "channel:1")
     TestSocket.join(conn.socket, "channel:1")
-    assert {:ok, 9} == TestSocket.push(conn.socket, "channel:1", "some_event")
 
-    # the other channel counter should not be reset
+    assert {:ok, 9} == TestSocket.push(conn.socket, "channel:1", "some_event")
     assert {:ok, 10} == TestSocket.push(conn.socket, "channel:2", "channel_2_second_event")
   end
 
