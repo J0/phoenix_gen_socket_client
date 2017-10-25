@@ -60,7 +60,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert_receive {TestSite.Channel, {:terminate, {:shutdown, :left}}}
   end
 
-  test "push references on the same channel" do
+  test "push references are monotonically increasing on the same channel" do
     conn = join_channel()
     {:ok, ref1} = TestSocket.push(conn.socket, "channel:1", "event1")
     {:ok, ref2} = TestSocket.push(conn.socket, "channel:1", "event2")
@@ -68,7 +68,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert ref1 < ref2
   end
 
-  test "push references on multiple channels" do
+  test "push references are monotonically increasing on multiple channels" do
     conn = join_channel()
     {:ok, _} = TestSocket.join(conn.socket, "channel:2")
     {:ok, ref1} = TestSocket.push(conn.socket, "channel:1", "event1")
@@ -77,7 +77,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert ref1 < ref2
   end
 
-  test "push references are not reset after leave/rejoin" do
+  test "push references are monotonically increasing after leave/rejoin" do
     conn = join_channel()
     {:ok, ref1} = TestSocket.push(conn.socket, "channel:1", "event1")
     {:ok, %{}} = TestSocket.leave(conn.socket, "channel:1")
