@@ -1,14 +1,14 @@
 defmodule Phoenix.GenSocketClient.Mixfile do
   use Mix.Project
 
-  @version "1.2.0"
+  @version "2.0.0"
   @github_url "https://github.com/Aircloak/phoenix_gen_socket_client"
 
   def project do
     [
       app: :phoenix_gen_socket_client,
       version: @version,
-      elixir: "~> 1.2",
+      elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -26,30 +26,26 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   end
 
   def application do
-    [applications: applications(Mix.env)]
+    [extra_applications: [:logger | extra_applications(Mix.env)]]
   end
+
+  defp extra_applications(:prod), do: []
+  defp extra_applications(_), do: [:websocket_client, :poison]
 
   defp deps do
     [
+      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4", optional: true},
+      {:poison, "~> 2.0 or ~> 3.0", optional: true},
+      {:phoenix, "~> 1.3", only: :test},
+      {:cowboy, "~> 1.0", only: :test},
       {:credo, "~> 0.3.0", only: [:dev, :test]},
       {:dialyze, "~> 0.2.1", only: :dev},
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4",
-        only: [:dev, :test, :docs]},
-      {:poison, "~> 1.5", only: :test},
-      {:phoenix, "~> 1.1.4", only: :test},
-      {:cowboy, "~> 1.0", only: :test},
-      {:gproc, "~> 0.5.0", only: :test},
-      {:ex_doc, "~> 0.11", only: :docs},
-      {:earmark, "~> 0.2", only: :docs}
+      {:ex_doc, "~> 0.17.1", only: :docs}
     ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
-
-  defp applications(:test), do: [:logger, :websocket_client, :gproc, :cowboy, :phoenix]
-  defp applications(:dev), do: [:logger, :websocket_client]
-  defp applications(_), do: [:logger]
 
   defp package do
     [

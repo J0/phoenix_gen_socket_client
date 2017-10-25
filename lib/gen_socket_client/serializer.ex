@@ -23,12 +23,8 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
   # -------------------------------------------------------------------
 
   @doc false
-  def decode_message(encoded_message) do
-    %{"topic" => topic, "event" => event, "payload" => payload, "ref" => ref} =
-      Poison.decode!(encoded_message)
-
-    %{topic: topic, event: event, payload: payload, ref: ref}
-  end
+  def decode_message(encoded_message), do:
+    Poison.decode!(encoded_message)
 
   @doc false
   def encode_message(message) do
@@ -49,14 +45,10 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.GzipJson do
   # -------------------------------------------------------------------
 
   @doc false
-  def decode_message(encoded_message) do
-    %{"topic" => topic, "event" => event, "payload" => payload, "ref" => ref} =
-      encoded_message
-      |> :zlib.gunzip()
-      |> Poison.decode!()
-
-    %{topic: topic, event: event, payload: payload, ref: ref}
-  end
+  def decode_message(encoded_message), do:
+    encoded_message
+    |> :zlib.gunzip()
+    |> Poison.decode!()
 
   @doc false
   def encode_message(message) do

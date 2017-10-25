@@ -1,9 +1,11 @@
 sudo: false
 language: elixir
-elixir:
-  - 1.2.3
-otp_release:
-  - 18.2.1
+matrix:
+  include:
+    - otp_release: 19.0
+      elixir: 1.5
+    - otp_release: 20.0
+      elixir: 1.5
 env:
   global:
     - MIX_HOME=$(pwd)/.mix
@@ -14,6 +16,7 @@ cache:
 install:
   - mkdir -p $MIX_HOME
   - mix local.hex --force
+  - mix local.rebar --force
 before_script:
   - mix deps.get
   - mix compile --warnings-as-errors

@@ -1,4 +1,4 @@
-defmodule Example.PingChannel do
+defmodule ExampleWeb.PingChannel do
   use Phoenix.Channel
   require Logger
 

@@ -6,12 +6,12 @@
 use Mix.Config
 
 # Configures the endpoint
-config :example, Example.Endpoint,
+config :example, ExampleWeb.Endpoint,
   url: [host: "localhost"],
   root: Path.dirname(__DIR__),
   secret_key_base: "hrufpKGP9jdGkwuetFaSHLc3qopzBoISBUhglIulV4PAfI0Iy0oZOhTx3oSMU5Vn",
   render_errors: [accepts: ~w(json)],
-  pubsub: [name: Example.PubSub,
+  pubsub: [name: ExampleWeb.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger

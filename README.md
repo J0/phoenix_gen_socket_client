@@ -5,7 +5,9 @@ Status](https://travis-ci.org/Aircloak/phoenix_gen_socket_client.svg?branch=mast
 [![hex.pm](https://img.shields.io/hexpm/v/phoenix_gen_socket_client.svg?style=flat-square)](https://hex.pm/packages/phoenix_gen_socket_client)
 [![hexdocs.pm](https://img.shields.io/badge/docs-latest-green.svg?style=flat-square)](https://hexdocs.pm/phoenix_gen_socket_client/)
 
-This library implements an Elixir client for Phoenix Channels protocol. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
+This library implements an Elixir client for Phoenix Channels protocol 2.x. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
+
+__NOTE__: From version 2.0 onwards this library only supports version 2.0 of the channels protocol (used on Phoenix 1.3 or later). If you need to use the version 1.0 of the protocol, you need to use [the older version of this library](https://hex.pm/packages/phoenix_gen_socket_client/1.2.0).
 
 
 ## Status
@@ -22,7 +24,7 @@ You need to add the project as a dependency to your `mix.exs`:
 def project do
   [
     deps: [
-      {:phoenix_gen_socket_client, "~> 1.1.1"}
+      {:phoenix_gen_socket_client, "~> 2.0.0"}
       # ...
     ],
     # ...
@@ -36,8 +38,8 @@ You also need to add the transport (e.g. a websocket client), and serializer (e.
 def project do
   [
     deps: [
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.1.0"},
-      {:poison, "~> 1.5.2"}
+      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4"},
+      {:poison, "~> 2.0"}
 
       # ...
     ],
@@ -83,13 +85,13 @@ The socket url must also include the transport suffix. For example, if in the se
 
 ### Connection life-cycle
 
-If `init/1` returns `{:connect, url, initial_state}`, the connection will be established immediately. The connection is established in a separate process, which we call the _transport process_. This process is the immediate child of the socket process. Consequently, all communication takes place concurrently to the socket process. If you handle some Erlang messages in the socket process, you may need to keep track of whether you're connected or not.
+If `init/1` returns `{:connect, url, query_params, initial_state}` the socket process will try to connect to the server. The connection is established in a separate process which we call the transport process. This process is the immediate child of the socket process. As a consequence, all communication takes place concurrently to the socket process. If you handle Erlang messages in the socket process you may need to keep track of whether you're connected or not.
 
-If the connection is established, the `handle_connected/2` callback will be invoked. If establishing of the connection fails, `handle_disconnected/2` callback is invoked. The same callback is invoked if the established connection is lost.
+The establishing of the connection is done asynchronously. The `handle_connected/2` callback is invoked after the connection is established. The `handle_disconnected/2` callback is invoked if establishing the connection fails or an existing connection is lost.
 
-If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple.
+If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple. In this case the workflow is the same as when returning the `:connect` tuple from the `init/1` callback.
 
-Finally, you can also decide to connect at some later time by returning `{:noconnect, url, state}` from the `init/1` callback. To connect later, you need to send an Erlang message to the socket process, and return `{:connect, state}` tuple.
+You may also decide to defer connecting to a later point in time by returning `{:noconnect, url, query_params, state}` from the `init/1` callback. To later establish a connection you need to send some message to the socket process, and handle that message in `handle_info` by returning the `{:connect, state}` tuple.
 
 Though somewhat elaborate, this approach has following benefits:
 

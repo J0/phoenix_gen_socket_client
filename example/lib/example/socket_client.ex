@@ -13,7 +13,7 @@ defmodule Example.SocketClient do
   end
 
   def init(url) do
-    {:connect, url, %{first_join: true, ping_ref: 1}}
+    {:connect, url, [], %{first_join: true, ping_ref: 1}}
   end
 
   def handle_connected(transport, state) do

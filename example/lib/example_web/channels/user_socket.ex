@@ -1,8 +1,8 @@
-defmodule Example.UserSocket do
+defmodule ExampleWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "ping", Example.PingChannel
+  channel "ping", ExampleWeb.PingChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

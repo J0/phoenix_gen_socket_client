@@ -1,4 +1,4 @@
-defmodule Example.Web do
+defmodule ExampleWeb do
   @moduledoc """
   A module that keeps using definitions for controllers,
   views and so on.
@@ -24,23 +24,23 @@ defmodule Example.Web do
 
   def controller do
     quote do
-      use Phoenix.Controller
+      use Phoenix.Controller, namespace: ExampleWeb
 
-      import Example.Router.Helpers
-      import Example.Gettext
+      import ExampleWeb.Router.Helpers
+      import ExampleWeb.Gettext
     end
   end
 
   def view do
     quote do
-      use Phoenix.View, root: "web/templates"
+      use Phoenix.View, root: "lib/example_web/templates", namespace: ExampleWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
 
-      import Example.Router.Helpers
-      import Example.ErrorHelpers
-      import Example.Gettext
+      import ExampleWeb.Router.Helpers
+      import ExampleWeb.ErrorHelpers
+      import ExampleWeb.Gettext
     end
   end
 
@@ -53,7 +53,7 @@ defmodule Example.Web do
   def channel do
     quote do
       use Phoenix.Channel
-      import Example.Gettext
+      import ExampleWeb.Gettext
     end
   end
 

@@ -1,21 +1,35 @@
 defmodule TestSite do
+  defmodule PubSub do
+    def start_link(), do:
+      Registry.start_link(:duplicate, __MODULE__)
+
+    def subscribe(subscriber_key), do:
+      Registry.register(__MODULE__, subscriber_key, nil)
+
+    def notify(subscriber_key, message), do:
+      __MODULE__
+      |> Registry.lookup(subscriber_key)
+      |> Enum.map(fn({pid, _value}) -> pid end)
+      |> Enum.each(&send(&1, message))
+  end
+
   defmodule Endpoint do
-    use Phoenix.Endpoint, otp_app: :aircloak_common
+    use Phoenix.Endpoint, otp_app: :phoenix_gen_socket_client
 
     socket "/test_socket", TestSite.Socket
 
-    defoverridable start_link: 0
-    def start_link do
-      Application.put_env(:aircloak_common, __MODULE__, [
-            https: false,
-            http: [port: 29876],
-            secret_key_base: String.duplicate("abcdefgh", 8),
-            debug_errors: false,
-            server: true,
-            pubsub: [adapter: Phoenix.PubSub.PG2, name: __MODULE__]
-          ])
-
-      super()
+    @doc false
+    def init(:supervisor, config) do
+      {:ok,
+        Keyword.merge(config,
+          https: false,
+          http: [port: 29876],
+          secret_key_base: String.duplicate("abcdefgh", 8),
+          debug_errors: false,
+          server: true,
+          pubsub: [adapter: Phoenix.PubSub.PG2, name: __MODULE__]
+        )
+      }
     end
   end
 
@@ -42,8 +56,8 @@ defmodule TestSite do
     @moduledoc false
     use Phoenix.Channel
 
-    def subscribe,
-      do: :gproc.reg(subscriber_key())
+    def subscribe(), do:
+      TestSite.PubSub.subscribe(__MODULE__)
 
     def join(topic, join_payload, socket) do
       notify({:join, topic, join_payload, self()})
@@ -67,12 +81,10 @@ defmodule TestSite do
       {:noreply, socket}
     end
 
-    def terminate(reason, _socket),
-      do: notify({:terminate, reason})
+    def terminate(reason, _socket), do:
+      notify({:terminate, reason})
 
-    defp notify(message),
-      do: :gproc.send(subscriber_key(), {__MODULE__, message})
-
-    defp subscriber_key, do: {:p, :l, __MODULE__}
+    defp notify(message), do:
+      TestSite.PubSub.notify(__MODULE__, {__MODULE__, message})
   end
 end
