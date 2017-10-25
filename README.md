@@ -85,13 +85,13 @@ The socket url must also include the transport suffix. For example, if in the se
 
 ### Connection life-cycle
 
-If `init/1` returns `{:connect, url, query_params, initial_state}` the connection will be established immediately. The connection is established in a separate process which we call the transport process. This process is the immediate child of the socket process. As a consequence, all communication takes place concurrently to the socket process. If you handle Erlang messages in the socket process you may need to keep track of whether you're connected or not.
+If `init/1` returns `{:connect, url, query_params, initial_state}` the socket process will try to connect to the server. The connection is established in a separate process which we call the transport process. This process is the immediate child of the socket process. As a consequence, all communication takes place concurrently to the socket process. If you handle Erlang messages in the socket process you may need to keep track of whether you're connected or not.
 
-The `handle_connected/2` callback is invoked when the connection is established. The `handle_disconnected/2` callback is invoked if establishing the connection fails or an existing connection is lost.
+The establishing of the connection is done asynchronously. The `handle_connected/2` callback is invoked after the connection is established. The `handle_disconnected/2` callback is invoked if establishing the connection fails or an existing connection is lost.
 
 If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple. In this case the workflow is the same as when returning the `:connect` tuple from the `init/1` callback.
 
-Finally, you can also decide to connect at some later time by returning `{:noconnect, url, query_params, state}` from the `init/1` callback. To connect later, you need to send an Erlang message to the socket process, and return `{:connect, state}` tuple.
+You may also decide to defer connecting to a later point in time by returning `{:noconnect, url, query_params, state}` from the `init/1` callback. To later establish a connection you need to send some message to the socket process, and handle that message in `handle_info` by returning the `{:connect, state}` tuple.
 
 Though somewhat elaborate, this approach has following benefits:
 
