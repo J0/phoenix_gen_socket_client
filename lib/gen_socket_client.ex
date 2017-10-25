@@ -332,14 +332,16 @@ defmodule Phoenix.Channels.GenSocketClient do
   defp maybe_connect(:noconnect, state), do: state
 
   defp connect(%{transport_pid: nil} = state) do
-    unless is_nil(URI.parse(state.url).query) do
+    if params_in_url?(state.url), do:
       raise ArgumentError, "query parameters must be passed as a keyword list from the `init/1` callback"
-    end
 
     {:ok, transport_pid} = state.transport_mod.start_link(url(state), state.transport_opts)
     transport_mref = Process.monitor(transport_pid)
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
+
+  defp params_in_url?(url), do:
+    not is_nil(URI.parse(url).query)
 
   defp url(state), do:
     "#{state.url}?#{URI.encode_query(state.query_params)}"
