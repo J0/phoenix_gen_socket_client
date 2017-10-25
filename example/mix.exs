@@ -37,7 +37,7 @@ defmodule Example.Mixfile do
       # Note: we're using a local dependency here to keep this project in sync with the repo state.
       # In regular production you should use the latest published hex version.
       {:phoenix_gen_socket_client, path: "../"},
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4"}
+      {:websocket_client, "~> 1.2"}
     ]
   end
 end

@@ -34,7 +34,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
 
   defp deps do
     [
-      {:websocket_client, github: "sanmiguel/websocket_client", tag: "1.2.4", optional: true},
+      {:websocket_client, "~> 1.2", optional: true},
       {:poison, "~> 2.0 or ~> 3.0", optional: true},
       {:phoenix, "~> 1.3", only: :test},
       {:cowboy, "~> 1.0", only: :test},
