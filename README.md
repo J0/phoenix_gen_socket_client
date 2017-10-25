@@ -7,7 +7,7 @@ Status](https://travis-ci.org/Aircloak/phoenix_gen_socket_client.svg?branch=mast
 
 This library implements an Elixir client for Phoenix Channels protocol 2.x. The client is implemented as a behaviour, which allows a lot of flexibility. For an alternative approach, you may also want to check [this project](https://github.com/mobileoverlord/phoenix_channel_client).
 
-__NOTE__: the latest version of this library supports only the version 2.0 of the channels protocol (used on Phoenix 1.3 or later). If you need to use the version 1.0 of the protocol, you need to use [the older version of this library](https://hex.pm/packages/phoenix_gen_socket_client/1.2.0).
+__NOTE__: From version 2.0 onwards this library only supports version 2.0 of the channels protocol (used on Phoenix 1.3 or later). If you need to use the version 1.0 of the protocol, you need to use [the older version of this library](https://hex.pm/packages/phoenix_gen_socket_client/1.2.0).
 
 
 ## Status
@@ -85,9 +85,9 @@ The socket url must also include the transport suffix. For example, if in the se
 
 ### Connection life-cycle
 
-If `init/1` returns `{:connect, url, query_params, initial_state}`, the connection will be established immediately. The connection is established in a separate process, which we call the _transport process_. This process is the immediate child of the socket process. Consequently, all communication takes place concurrently to the socket process. If you handle some Erlang messages in the socket process, you may need to keep track of whether you're connected or not.
+If `init/1` returns `{:connect, url, query_params, initial_state}` the connection will be established immediately. The connection is established in a separate process which we call the transport process. This process is the immediate child of the socket process. As a consequence, all communication takes place concurrently to the socket process. If you handle Erlang messages in the socket process you may need to keep track of whether you're connected or not.
 
-If the connection is established, the `handle_connected/2` callback will be invoked. If establishing of the connection fails, `handle_disconnected/2` callback is invoked. The same callback is invoked if the established connection is lost.
+The `handle_connected/2` callback is invoked when the connection is established. The `handle_disconnected/2` callback is invoked if establishing the connection fails or an existing connection is lost.
 
 If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple.
 
