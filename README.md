@@ -89,7 +89,7 @@ If `init/1` returns `{:connect, url, query_params, initial_state}` the connectio
 
 The `handle_connected/2` callback is invoked when the connection is established. The `handle_disconnected/2` callback is invoked if establishing the connection fails or an existing connection is lost.
 
-If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple.
+If the connection is not established (or dropped), you can reconnect from `handle_*` functions by returning `{:connect, state}` tuple. In this case the workflow is the same as when returning the `:connect` tuple from the `init/1` callback.
 
 Finally, you can also decide to connect at some later time by returning `{:noconnect, url, query_params, state}` from the `init/1` callback. To connect later, you need to send an Erlang message to the socket process, and return `{:connect, state}` tuple.
 
