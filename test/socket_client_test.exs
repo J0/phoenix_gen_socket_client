@@ -60,21 +60,31 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert_receive {TestSite.Channel, {:terminate, {:shutdown, :left}}}
   end
 
-  test "client message push references" do
+  test "push references on the same channel" do
     conn = join_channel()
-    assert {:ok, _} = TestSocket.join(conn.socket, "channel:2")
+    {:ok, ref1} = TestSocket.push(conn.socket, "channel:1", "event1")
+    {:ok, ref2} = TestSocket.push(conn.socket, "channel:1", "event2")
 
-    assert {:ok, 3} == TestSocket.push(conn.socket, "channel:1", "some_event")
-    assert {:ok, 4} == TestSocket.push(conn.socket, "channel:1", "another_event")
-    assert {:ok, 5} == TestSocket.push(conn.socket, "channel:2", "channel_2_event")
-    assert {:ok, 6} == TestSocket.push(conn.socket, "channel:1", "yet_another_event")
+    assert ref1 < ref2
+  end
 
-    # leave and rejoin the channel
-    assert {:ok, %{}} == TestSocket.leave(conn.socket, "channel:1")
+  test "push references on multiple channels" do
+    conn = join_channel()
+    {:ok, _} = TestSocket.join(conn.socket, "channel:2")
+    {:ok, ref1} = TestSocket.push(conn.socket, "channel:1", "event1")
+    {:ok, ref2} = TestSocket.push(conn.socket, "channel:2", "event2")
+
+    assert ref1 < ref2
+  end
+
+  test "push references are not reset after leave/rejoin" do
+    conn = join_channel()
+    {:ok, ref1} = TestSocket.push(conn.socket, "channel:1", "event1")
+    {:ok, %{}} = TestSocket.leave(conn.socket, "channel:1")
     TestSocket.join(conn.socket, "channel:1")
+    {:ok, ref2} = TestSocket.push(conn.socket, "channel:1", "event2")
 
-    assert {:ok, 9} == TestSocket.push(conn.socket, "channel:1", "some_event")
-    assert {:ok, 10} == TestSocket.push(conn.socket, "channel:2", "channel_2_second_event")
+    assert ref1 < ref2
   end
 
   test "connection error" do
