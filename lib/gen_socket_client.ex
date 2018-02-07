@@ -187,6 +187,18 @@ defmodule Phoenix.Channels.GenSocketClient do
     end
   end
 
+  @doc "Get status of topic. returns :joined or :not_joined"
+  @spec topic_status(topic) :: :joined | :not_joined
+  def topic_status(topic) do
+    case join_ref(topic) do
+      nil ->
+        :not_joined
+      _ ->
+        :joined
+    end
+  end
+
+
   @doc "Can be invoked to send a response to the client."
   @spec reply(GenServer.from, any) :: :ok
   defdelegate reply(from, response), to: GenServer

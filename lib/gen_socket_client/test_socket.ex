@@ -117,6 +117,12 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     end
   end
 
+  @doc "queries the status of a topic."
+  @spec topic_status(GenServer.server, GenSocketClient.topic) :: :joined | :not_joined
+  def topic_status(socket, topic) do
+    GenSocketClient.call(socket, {:topic_status, topic})
+  end
+
 
   # -------------------------------------------------------------------
   # Channels.Client.GenSocketClient callbacks
@@ -191,5 +197,11 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   def handle_call({:push, topic, event, payload}, _from, transport, client) do
     push_result = GenSocketClient.push(transport, topic, event, payload)
     {:reply, push_result, client}
+  end
+
+  @doc false
+  def handle_call({:topic_status, topic}, _from, _transport, client) do
+    topic_status_result = GenSocketClient.topic_status(topic)
+    {:reply, topic_status_result, client}
   end
 end
