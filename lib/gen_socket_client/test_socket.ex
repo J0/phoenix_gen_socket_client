@@ -117,7 +117,7 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     end
   end
 
-  @doc "queries the status of a topic."
+  @doc "Returns true if the socket is joined on the given topic."
   @spec joined?(GenServer.server, GenSocketClient.topic) :: boolean
   def joined?(socket, topic) do
     GenSocketClient.call(socket, {:joined?, topic})

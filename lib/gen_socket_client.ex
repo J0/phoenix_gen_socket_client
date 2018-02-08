@@ -187,7 +187,11 @@ defmodule Phoenix.Channels.GenSocketClient do
     end
   end
 
-  @doc "Get the status of a topic. Returns true or false."
+  @doc """
+  Returns true if the socket is joined on the given topic.
+
+  This function should be invoked from the `GenSocketClient` callback module.
+  """
   @spec joined?(topic) :: boolean
   def joined?(topic), do: not is_nil(join_ref(topic))
 
