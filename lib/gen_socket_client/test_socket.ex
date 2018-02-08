@@ -118,9 +118,9 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   end
 
   @doc "queries the status of a topic."
-  @spec topic_status(GenServer.server, GenSocketClient.topic) :: :joined | :not_joined
-  def topic_status(socket, topic) do
-    GenSocketClient.call(socket, {:topic_status, topic})
+  @spec joined?(GenServer.server, GenSocketClient.topic) :: boolean
+  def joined?(socket, topic) do
+    GenSocketClient.call(socket, {:joined?, topic})
   end
 
 
@@ -200,8 +200,8 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   end
 
   @doc false
-  def handle_call({:topic_status, topic}, _from, _transport, client) do
-    topic_status_result = GenSocketClient.topic_status(topic)
-    {:reply, topic_status_result, client}
+  def handle_call({:joined?, topic}, _from, _transport, client) do
+    result = GenSocketClient.joined?(topic)
+    {:reply, result, client}
   end
 end

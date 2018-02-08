@@ -162,12 +162,12 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "get status of joined channel" do
     conn = join_channel()
-    assert TestSocket.topic_status(conn.socket, "channel:1") == :joined
+    assert TestSocket.joined?(conn.socket, "channel:1") == true
   end
 
   test "get status of not joined channel" do
     conn = join_channel()
-    assert TestSocket.topic_status(conn.socket, "channel:2") == :not_joined
+    assert TestSocket.joined?(conn.socket, "channel:2") == :false
   end
 
   defp join_channel do
