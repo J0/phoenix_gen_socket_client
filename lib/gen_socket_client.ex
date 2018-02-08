@@ -187,7 +187,7 @@ defmodule Phoenix.Channels.GenSocketClient do
     end
   end
 
-  @doc "Get status of topic. returns :joined or :not_joined"
+  @doc "Get status of topic. Returns true or false."
   @spec joined?(topic) :: boolean
   def joined?(topic) do
     case join_ref(topic) do
