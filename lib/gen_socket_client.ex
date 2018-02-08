@@ -380,8 +380,8 @@ defmodule Phoenix.Channels.GenSocketClient do
 
   defp reinit(state) do
     Process.get_keys()
-    |> Enum.filter(&match?({__MODULE__, _}, &1))
-    |> Enum.map(&Process.delete/1)
+    |> Stream.filter(&match?({__MODULE__, _}, &1))
+    |> Enum.each(&Process.delete/1)
 
     if state.transport_mref != nil, do: Process.demonitor(state.transport_mref, [:flush])
     %{state | transport_pid: nil, transport_mref: nil}
