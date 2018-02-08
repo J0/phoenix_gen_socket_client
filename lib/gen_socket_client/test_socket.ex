@@ -117,6 +117,12 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     end
   end
 
+  @doc "Returns true if the socket is joined on the given topic."
+  @spec joined?(GenServer.server, GenSocketClient.topic) :: boolean
+  def joined?(socket, topic) do
+    GenSocketClient.call(socket, {:joined?, topic})
+  end
+
 
   # -------------------------------------------------------------------
   # Channels.Client.GenSocketClient callbacks
@@ -191,5 +197,11 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
   def handle_call({:push, topic, event, payload}, _from, transport, client) do
     push_result = GenSocketClient.push(transport, topic, event, payload)
     {:reply, push_result, client}
+  end
+
+  @doc false
+  def handle_call({:joined?, topic}, _from, _transport, client) do
+    result = GenSocketClient.joined?(topic)
+    {:reply, result, client}
   end
 end
