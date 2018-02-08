@@ -1,5 +1,8 @@
 defmodule TestSite do
+  @moduledoc false
+
   defmodule PubSub do
+    @moduledoc false
     def start_link(), do: Registry.start_link(:duplicate, __MODULE__)
 
     def subscribe(subscriber_key), do: Registry.register(__MODULE__, subscriber_key, nil)
@@ -13,6 +16,7 @@ defmodule TestSite do
   end
 
   defmodule Endpoint do
+    @moduledoc false
     use Phoenix.Endpoint, otp_app: :phoenix_gen_socket_client
 
     socket("/test_socket", TestSite.Socket)
