@@ -9,9 +9,9 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       app: :phoenix_gen_socket_client,
       version: @version,
       elixir: "~> 1.5",
-      elixirc_paths: elixirc_paths(Mix.env),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
       description: "Socket client behaviour for phoenix channels.",
@@ -19,14 +19,14 @@ defmodule Phoenix.GenSocketClient.Mixfile do
         source_url: @github_url,
         source_ref: "v#{@version}",
         main: "readme",
-        extras: ["README.md"],
+        extras: ["README.md"]
       ],
-      preferred_cli_env: [docs: :docs],
+      preferred_cli_env: [docs: :docs]
     ]
   end
 
   def application do
-    [extra_applications: [:logger | extra_applications(Mix.env)]]
+    [extra_applications: [:logger | extra_applications(Mix.env())]]
   end
 
   defp extra_applications(:prod), do: []

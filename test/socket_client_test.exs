@@ -38,20 +38,28 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "send and response" do
     conn = join_channel()
-    {:ok, payload} = TestSocket.push_sync(conn.socket, "channel:1", "sync_event", %{"foo" => "bar"})
+
+    {:ok, payload} =
+      TestSocket.push_sync(conn.socket, "channel:1", "sync_event", %{"foo" => "bar"})
+
     assert %{"status" => "ok", "response" => %{"foo" => "bar"}} = payload
   end
 
   test "sending a mesasge that cannot be encoded" do
     conn = join_channel()
+
     assert {:error, {:encoding_error, {:invalid, <<166>>}}} =
-      TestSocket.push_sync(conn.socket, "channel:1", "sync_event", %{"foo" => _invalid_string = <<166>>})
+             TestSocket.push_sync(conn.socket, "channel:1", "sync_event", %{
+               "foo" => _invalid_string = <<166>>
+             })
   end
 
   test "client message receive" do
     conn = join_channel()
     send(conn.server_channel, {:push, "some_event", %{"foo" => "bar"}})
-    assert {:ok, {"channel:1", "some_event", %{"foo" => "bar"}}} = TestSocket.await_message(conn.socket)
+
+    assert {:ok, {"channel:1", "some_event", %{"foo" => "bar"}}} =
+             TestSocket.await_message(conn.socket)
   end
 
   test "leave the channel" do
@@ -154,10 +162,11 @@ defmodule Phoenix.Channels.GenSocketClientTest do
   test "server channel crashes" do
     conn = join_channel()
     socket = conn.socket
+
     ExUnit.CaptureLog.capture_log(fn ->
-          send(conn.server_channel, {:crash, :some_reason})
-          assert_receive {^socket, :channel_closed, "channel:1", %{}}
-        end)
+      send(conn.server_channel, {:crash, :some_reason})
+      assert_receive {^socket, :channel_closed, "channel:1", %{}}
+    end)
   end
 
   test "get status of joined channel" do
@@ -167,7 +176,7 @@ defmodule Phoenix.Channels.GenSocketClientTest do
 
   test "get status of not joined channel" do
     conn = join_channel()
-    assert TestSocket.joined?(conn.socket, "channel:2") == :false
+    assert TestSocket.joined?(conn.socket, "channel:2") == false
   end
 
   defp join_channel do
@@ -179,8 +188,14 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     %{socket: socket, server_channel: server_channel}
   end
 
-  defp start_socket(url \\ url(), query_params \\ query_params(), connect \\ true), do:
-    TestSocket.start_link(Phoenix.Channels.GenSocketClient.Transport.WebSocketClient, url, query_params, connect)
+  defp start_socket(url \\ url(), query_params \\ query_params(), connect \\ true) do
+    TestSocket.start_link(
+      Phoenix.Channels.GenSocketClient.Transport.WebSocketClient,
+      url,
+      query_params,
+      connect
+    )
+  end
 
   defp url() do
     "#{Endpoint.url()}/test_socket/websocket"
