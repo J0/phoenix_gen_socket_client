@@ -18,7 +18,6 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   require Record
   alias Phoenix.Channels.GenSocketClient
 
-
   # -------------------------------------------------------------------
   # Phoenix.Channels.GenSocketClient.Transport callbacks
   # -------------------------------------------------------------------
@@ -36,19 +35,20 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
     :ok
   end
 
-
   # -------------------------------------------------------------------
   # :websocket_client callbacks
   # -------------------------------------------------------------------
 
   @doc false
   def init([socket, transport_options]) do
-    {:once, %{socket: socket, keepalive: Keyword.get(transport_options, :keepalive, :timer.seconds(30))}}
+    {:once,
+     %{socket: socket, keepalive: Keyword.get(transport_options, :keepalive, :timer.seconds(30))}}
   end
 
   @doc false
   def onconnect(_req, state) do
     GenSocketClient.notify_connected(state.socket)
+
     case state.keepalive do
       nil -> {:ok, state}
       keepalive -> {:ok, state, keepalive}
@@ -56,22 +56,21 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   end
 
   @doc false
-  def websocket_handle({:pong, _message}, _req, state),
-    do: {:ok, state}
+  def websocket_handle({:pong, _message}, _req, state), do: {:ok, state}
+
   def websocket_handle({type, message}, _req, state) when type in [:text, :binary] do
     GenSocketClient.notify_message(state.socket, message)
     {:ok, state}
   end
+
   def websocket_handle(other_msg, _req, state) do
-    Logger.warn(fn -> "Unknown message #{inspect other_msg}" end)
+    Logger.warn(fn -> "Unknown message #{inspect(other_msg)}" end)
     {:ok, state}
   end
 
   @doc false
-  def websocket_info({:send_frame, frame}, _req, state),
-    do: {:reply, frame, state}
-  def websocket_info(_message, _req, state),
-    do: {:ok, state}
+  def websocket_info({:send_frame, frame}, _req, state), do: {:reply, frame, state}
+  def websocket_info(_message, _req, state), do: {:ok, state}
 
   @doc false
   def ondisconnect(reason, state) do

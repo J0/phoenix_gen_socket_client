@@ -15,6 +15,8 @@
         {Credo.Check.Consistency.SpaceInParentheses},
         {Credo.Check.Consistency.SpaceAroundOperators},
         {Credo.Check.Consistency.TabsOrSpaces},
+        {Credo.Check.Design.AliasUsage, if_called_more_often_than: 2},
+        {Credo.Check.Readability.ParenthesesOnZeroArityDefs, false},
         {Credo.Check.Readability.PredicateFunctionNames},
         {Credo.Check.Readability.TrailingBlankLine},
         {Credo.Check.Readability.TrailingWhiteSpace},

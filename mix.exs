@@ -9,9 +9,9 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       app: :phoenix_gen_socket_client,
       version: @version,
       elixir: "~> 1.5",
-      elixirc_paths: elixirc_paths(Mix.env),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
       description: "Socket client behaviour for phoenix channels.",
@@ -19,14 +19,14 @@ defmodule Phoenix.GenSocketClient.Mixfile do
         source_url: @github_url,
         source_ref: "v#{@version}",
         main: "readme",
-        extras: ["README.md"],
+        extras: ["README.md"]
       ],
-      preferred_cli_env: [docs: :docs],
+      preferred_cli_env: [docs: :docs]
     ]
   end
 
   def application do
-    [extra_applications: [:logger | extra_applications(Mix.env)]]
+    [extra_applications: [:logger | extra_applications(Mix.env())]]
   end
 
   defp extra_applications(:prod), do: []
@@ -38,7 +38,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       {:poison, "~> 2.0 or ~> 3.0", optional: true},
       {:phoenix, "~> 1.3", only: :test},
       {:cowboy, "~> 1.0", only: :test},
-      {:credo, "~> 0.3.0", only: [:dev, :test]},
+      {:credo, "~> 0.8.10", runtime: false},
       {:dialyze, "~> 0.2.1", only: :dev},
       {:ex_doc, "~> 0.17.1", only: :docs}
     ]
