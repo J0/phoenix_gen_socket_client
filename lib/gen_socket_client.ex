@@ -171,10 +171,10 @@ defmodule Phoenix.Channels.GenSocketClient do
   def push(transport, topic, event, payload) do
     cond do
       # first message on a channel must always be a join
-      event != "phx_join" and join_ref(topic) == nil ->
+      event != "phx_join" and not joined?(topic) ->
         {:error, :not_joined}
       # join must always be a first message
-      event == "phx_join" and join_ref(topic) != nil ->
+      event == "phx_join" and joined?(topic) ->
         {:error, :already_joined}
       true ->
         {join_ref, ref} = next_ref(event, topic)
