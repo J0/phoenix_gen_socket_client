@@ -58,8 +58,9 @@ defmodule TestSite do
   defmodule Channel do
     @moduledoc false
     use Phoenix.Channel
+    alias TestSite.PubSub
 
-    def subscribe(), do: TestSite.PubSub.subscribe(__MODULE__)
+    def subscribe(), do: PubSub.subscribe(__MODULE__)
 
     def join(topic, join_payload, socket) do
       notify({:join, topic, join_payload, self()})
@@ -85,6 +86,6 @@ defmodule TestSite do
 
     def terminate(reason, _socket), do: notify({:terminate, reason})
 
-    defp notify(message), do: TestSite.PubSub.notify(__MODULE__, {__MODULE__, message})
+    defp notify(message), do: PubSub.notify(__MODULE__, {__MODULE__, message})
   end
 end
