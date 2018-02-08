@@ -27,7 +27,7 @@ defmodule TestSite do
        Keyword.merge(
          config,
          https: false,
-         http: [port: 29876],
+         http: [port: 29_876],
          secret_key_base: String.duplicate("abcdefgh", 8),
          debug_errors: false,
          server: true,
