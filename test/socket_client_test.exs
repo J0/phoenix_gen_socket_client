@@ -28,6 +28,16 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1")
   end
 
+  test "connect with url and query_params" do
+    # start the socket. false means do not connect for now.
+    assert {:ok, socket} = start_socket(url(), query_params(), false)
+    refute :connected == TestSocket.wait_connect_status(socket, 100)
+    # connect by explicitly setting the url and query_params.
+    TestSocket.connect(socket, url_updated(), query_params_updated())
+    assert :connected == TestSocket.wait_connect_status(socket)
+    assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1")
+  end
+
   test "client message push" do
     assert {:ok, socket} = start_socket()
     assert :connected == TestSocket.wait_connect_status(socket)
@@ -204,4 +214,11 @@ defmodule Phoenix.Channels.GenSocketClientTest do
   end
 
   defp query_params(), do: [{"shared_secret", "supersecret"}]
+
+  defp url_updated() do
+    "#{Endpoint.url()}/test_socket_updated/websocket"
+    |> String.replace(~r(http://), "ws://")
+    |> String.replace(~r(https://), "wss://")
+  end
+  defp query_params_updated(), do: [{"shared_secret", "supersecret_updated"}]
 end

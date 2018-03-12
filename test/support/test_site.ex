@@ -20,6 +20,7 @@ defmodule TestSite do
     use Phoenix.Endpoint, otp_app: :phoenix_gen_socket_client
 
     socket("/test_socket", TestSite.Socket)
+    socket("/test_socket_updated", TestSite.SocketUpdated)
 
     @doc false
     def init(:supervisor, config) do
@@ -48,6 +49,25 @@ defmodule TestSite do
     def connect(params, socket) do
       case params["shared_secret"] do
         "supersecret" -> {:ok, socket}
+        _ -> :error
+      end
+    end
+
+    def id(_socket), do: ""
+  end
+
+  defmodule SocketUpdated do
+    @moduledoc false
+    use Phoenix.Socket
+
+    transport(:websocket, Phoenix.Transports.WebSocket)
+
+    # List of exposed channels
+    channel("channel:*", TestSite.Channel)
+
+    def connect(params, socket) do
+      case params["shared_secret"] do
+        "supersecret_updated" -> {:ok, socket}
         _ -> :error
       end
     end
