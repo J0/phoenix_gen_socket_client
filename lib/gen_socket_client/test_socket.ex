@@ -41,6 +41,7 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     :ok
   end
 
+  @doc "Connect to the server and override/replace the initialized url and query params."
   @spec connect(GenServer.server(), String.t(), GenSocketClient.query_params()) :: :ok
   def connect(socket, url, query_params) do
     send(socket, {:connect, url, query_params})
