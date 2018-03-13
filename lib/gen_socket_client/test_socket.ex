@@ -219,7 +219,9 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
 
   @doc false
   def handle_info(:connect, _transport, client), do: {:connect, client}
-  def handle_info({:connect, url, query_params}, _transport, client), do: {:connect, url, query_params, client}
+
+  def handle_info({:connect, url, query_params}, _transport, client),
+    do: {:connect, url, query_params, client}
 
   def handle_info({:join, topic, payload}, transport, client) do
     case GenSocketClient.join(transport, topic, payload) do

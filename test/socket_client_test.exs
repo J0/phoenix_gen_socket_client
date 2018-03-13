@@ -220,5 +220,6 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     |> String.replace(~r(http://), "ws://")
     |> String.replace(~r(https://), "wss://")
   end
+
   defp query_params_updated(), do: [{"shared_secret", "supersecret_updated"}]
 end

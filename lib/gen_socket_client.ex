@@ -418,10 +418,12 @@ defmodule Phoenix.Channels.GenSocketClient do
     do: {:noreply, connect(%{state | callback_state: callback_state})}
 
   defp handle_callback_response({:connect, url, query_params, callback_state}, state) do
-    state = state
-    |> Map.put( :callback_state, callback_state )
-    |> Map.put( :url, url )
-    |> Map.put( :query_params, Enum.uniq_by(query_params ++ [{"vsn", "2.0.0"}], &elem(&1, 0)) )
+    state =
+      state
+      |> Map.put(:callback_state, callback_state)
+      |> Map.put(:url, url)
+      |> Map.put(:query_params, Enum.uniq_by(query_params ++ [{"vsn", "2.0.0"}], &elem(&1, 0)))
+
     {:noreply, connect(state)}
   end
 
