@@ -41,6 +41,13 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
     :ok
   end
 
+  @doc "Connect to the server and override/replace the initialized url and query params."
+  @spec connect(GenServer.server(), String.t(), GenSocketClient.query_params()) :: :ok
+  def connect(socket, url, query_params) do
+    send(socket, {:connect, url, query_params})
+    :ok
+  end
+
   @doc "Waits until the socket is connected or disconnected"
   @spec wait_connect_status(GenServer.server(), GenServer.timeout()) ::
           :connected
@@ -213,6 +220,9 @@ defmodule Phoenix.Channels.GenSocketClient.TestSocket do
 
   @doc false
   def handle_info(:connect, _transport, client), do: {:connect, client}
+
+  def handle_info({:connect, url, query_params}, _transport, client),
+    do: {:connect, url, query_params, client}
 
   def handle_info({:join, topic, payload}, transport, client) do
     case GenSocketClient.join(transport, topic, payload) do

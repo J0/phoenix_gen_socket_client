@@ -93,6 +93,9 @@ If the connection is not established (or dropped), you can reconnect from `handl
 
 You may also decide to defer connecting to a later point in time by returning `{:noconnect, url, query_params, state}` from the `init/1` callback. To later establish a connection you need to send some message to the socket process, and handle that message in `handle_info` by returning the `{:connect, state}` tuple.
 
+You may also return `{:connect, url, query_params, state}` from a `handle_info` callback to connect (or reconnect) the socket to a different location or with different params than it started with.
+
+
 Though somewhat elaborate, this approach has following benefits:
 
 1. The socket process starts immediately without waiting for the connection to be established.

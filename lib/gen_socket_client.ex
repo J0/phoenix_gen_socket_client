@@ -90,6 +90,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   @type handler_response ::
           {:ok, callback_state}
           | {:connect, callback_state}
+          | {:connect, url :: String.t(), query_params, callback_state}
           | {:stop, reason :: any, callback_state}
   @type query_params :: [{String.t(), String.t()}]
 
@@ -415,6 +416,16 @@ defmodule Phoenix.Channels.GenSocketClient do
 
   defp handle_callback_response({:connect, callback_state}, state),
     do: {:noreply, connect(%{state | callback_state: callback_state})}
+
+  defp handle_callback_response({:connect, url, query_params, callback_state}, state) do
+    state =
+      state
+      |> Map.put(:callback_state, callback_state)
+      |> Map.put(:url, url)
+      |> Map.put(:query_params, Enum.uniq_by(query_params ++ [{"vsn", "2.0.0"}], &elem(&1, 0)))
+
+    {:noreply, connect(state)}
+  end
 
   defp handle_callback_response({:stop, reason, callback_state}, state),
     do: {:stop, reason, %{state | callback_state: callback_state}}
