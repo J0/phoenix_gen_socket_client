@@ -1,3 +1,8 @@
+## 2.1.0
+
+- Added `Phoenix.Channels.GenSocketClient.joined?/1`
+- Added support for changing url and/or query parameters when reconnecting
+
 ## 2.0.0
 
 - requires Elixir 1.5 or greater
