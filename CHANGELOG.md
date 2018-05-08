@@ -1,3 +1,7 @@
+## 2.1.1
+
+- Uses credo only in `:dev` and `:test`, so it's not treated as a transitive dependency in client projects.
+
 ## 2.1.0
 
 - Added `Phoenix.Channels.GenSocketClient.joined?/1`
