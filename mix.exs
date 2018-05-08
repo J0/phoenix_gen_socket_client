@@ -38,7 +38,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       {:poison, "~> 2.0 or ~> 3.0", optional: true},
       {:phoenix, "~> 1.3", only: :test},
       {:cowboy, "~> 1.0", only: :test},
-      {:credo, "~> 0.8.10", runtime: false},
+      {:credo, "~> 0.8.10", only: [:dev, :test], runtime: false},
       {:dialyze, "~> 0.2.1", only: :dev},
       {:ex_doc, "~> 0.17.1", only: :docs}
     ]
