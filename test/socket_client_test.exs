@@ -20,6 +20,15 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert {:ok, {"channel:1", %{}}} == TestSocket.join(socket, "channel:1")
   end
 
+  test "reconnect works" do
+    assert {:ok, socket} = start_socket()
+    assert :connected == TestSocket.wait_connect_status(socket)
+
+    # reconnect to a different url
+    :ok = TestSocket.connect(socket, url_updated(), query_params_updated())
+    assert :connected == TestSocket.wait_connect_status(socket)
+  end
+
   test "no auto connect" do
     assert {:ok, socket} = start_socket(url(), query_params(), false)
     refute :connected == TestSocket.wait_connect_status(socket, 100)

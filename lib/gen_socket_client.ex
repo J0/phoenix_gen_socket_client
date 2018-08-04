@@ -375,6 +375,14 @@ defmodule Phoenix.Channels.GenSocketClient do
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
 
+  # reconnect - the transport_pid is already running (failed the above match)
+  # so now we need to reinit and try connecting again.
+  defp connect(state) do
+    state
+    |> reinit()
+    |> connect()
+  end
+
   defp params_in_url?(url), do: not is_nil(URI.parse(url).query)
 
   defp url(state), do: "#{state.url}?#{URI.encode_query(state.query_params)}"
@@ -384,7 +392,9 @@ defmodule Phoenix.Channels.GenSocketClient do
     |> Stream.filter(&match?({__MODULE__, _}, &1))
     |> Enum.each(&Process.delete/1)
 
-    if state.transport_mref != nil, do: Process.demonitor(state.transport_mref, [:flush])
+    if state.transport_mref, do: Process.demonitor(state.transport_mref, [:flush])
+    # if transport_pid is running, exit it so as to not leak processes
+    if state.transport_pid, do: Process.exit(state.transport_pid, :normal)
     %{state | transport_pid: nil, transport_mref: nil}
   end
 
