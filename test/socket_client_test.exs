@@ -29,7 +29,6 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert :connected == TestSocket.wait_connect_status(socket)
   end
 
-
   test "no auto connect" do
     assert {:ok, socket} = start_socket(url(), query_params(), false)
     refute :connected == TestSocket.wait_connect_status(socket, 100)

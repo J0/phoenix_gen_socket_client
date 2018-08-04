@@ -394,7 +394,7 @@ defmodule Phoenix.Channels.GenSocketClient do
 
     if transport_mref, do: Process.demonitor(transport_mref, [:flush])
     # if transport_pid is running, exit it so as to not leak processes
-    if transport_pid, do: Process.exit( transport_pid, :normal )
+    if transport_pid, do: Process.exit(transport_pid, :normal)
     %{state | transport_pid: nil, transport_mref: nil}
   end
 
