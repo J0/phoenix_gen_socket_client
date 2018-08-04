@@ -375,16 +375,23 @@ defmodule Phoenix.Channels.GenSocketClient do
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
 
+  defp connect(state) do
+    state
+    |> reinit()
+    |> connect()
+  end
+
   defp params_in_url?(url), do: not is_nil(URI.parse(url).query)
 
   defp url(state), do: "#{state.url}?#{URI.encode_query(state.query_params)}"
 
-  defp reinit(state) do
+  defp reinit(%{transport_mref: transport_mref, transport_pid: transport_pid} = state) do
     Process.get_keys()
     |> Stream.filter(&match?({__MODULE__, _}, &1))
     |> Enum.each(&Process.delete/1)
 
-    if state.transport_mref != nil, do: Process.demonitor(state.transport_mref, [:flush])
+    if transport_mref, do: Process.demonitor(transport_mref, [:flush])
+    if transport_pid, do: Process.exit( transport_pid, :kill )
     %{state | transport_pid: nil, transport_mref: nil}
   end
 
