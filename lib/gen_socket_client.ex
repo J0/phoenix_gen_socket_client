@@ -375,7 +375,8 @@ defmodule Phoenix.Channels.GenSocketClient do
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
 
-  # reconnect
+  # reconnect - the transport_pid is already running (failed the above match)
+  # so now we need to reinit and try connecting again.
   defp connect(state) do
     state
     |> reinit()
