@@ -387,14 +387,14 @@ defmodule Phoenix.Channels.GenSocketClient do
 
   defp url(state), do: "#{state.url}?#{URI.encode_query(state.query_params)}"
 
-  defp reinit(%{transport_mref: transport_mref, transport_pid: transport_pid} = state) do
+  defp reinit(state) do
     Process.get_keys()
     |> Stream.filter(&match?({__MODULE__, _}, &1))
     |> Enum.each(&Process.delete/1)
 
-    if transport_mref, do: Process.demonitor(transport_mref, [:flush])
+    if state.transport_mref, do: Process.demonitor(state.transport_mref, [:flush])
     # if transport_pid is running, exit it so as to not leak processes
-    if transport_pid, do: Process.exit(transport_pid, :normal)
+    if state.transport_pid, do: Process.exit(state.transport_pid, :normal)
     %{state | transport_pid: nil, transport_mref: nil}
   end
 
