@@ -375,6 +375,7 @@ defmodule Phoenix.Channels.GenSocketClient do
     %{state | transport_pid: transport_pid, transport_mref: transport_mref}
   end
 
+  # reconnect
   defp connect(state) do
     state
     |> reinit()
@@ -391,6 +392,7 @@ defmodule Phoenix.Channels.GenSocketClient do
     |> Enum.each(&Process.delete/1)
 
     if transport_mref, do: Process.demonitor(transport_mref, [:flush])
+    # if transport_pid is running, exit it so as to not leak processes
     if transport_pid, do: Process.exit( transport_pid, :normal )
     %{state | transport_pid: nil, transport_mref: nil}
   end
