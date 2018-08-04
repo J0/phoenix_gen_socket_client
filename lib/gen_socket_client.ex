@@ -391,7 +391,7 @@ defmodule Phoenix.Channels.GenSocketClient do
     |> Enum.each(&Process.delete/1)
 
     if transport_mref, do: Process.demonitor(transport_mref, [:flush])
-    if transport_pid, do: Process.exit( transport_pid, :kill )
+    if transport_pid, do: Process.exit( transport_pid, :normal )
     %{state | transport_pid: nil, transport_mref: nil}
   end
 
