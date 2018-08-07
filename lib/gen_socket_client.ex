@@ -199,7 +199,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   @doc """
   Returns true if the socket is joined on the given topic.
 
-  This function should be invoked from the `GenSocketClient` callback module.
+  This function should be invoked from the `GenSocketClient` process.
   """
   @spec joined?(topic) :: boolean
   def joined?(topic), do: not is_nil(join_ref(topic))
