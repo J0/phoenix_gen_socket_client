@@ -30,12 +30,12 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   end
 
   defp extra_applications(:prod), do: []
-  defp extra_applications(_), do: [:websocket_client, :poison]
+  defp extra_applications(_), do: [:websocket_client, :jason]
 
   defp deps do
     [
       {:websocket_client, "~> 1.2", optional: true},
-      {:poison, "~> 2.0 or ~> 3.0", optional: true},
+      {:jason, "~> 1.1", optional: true},
       {:phoenix, "~> 1.3", only: :test},
       {:cowboy, "~> 1.0", only: :test},
       {:credo, "~> 0.8.10", only: [:dev, :test], runtime: false},
