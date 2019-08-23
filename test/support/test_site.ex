@@ -3,7 +3,7 @@ defmodule TestSite do
 
   defmodule PubSub do
     @moduledoc false
-    def start_link(), do: Registry.start_link(:duplicate, __MODULE__)
+    def start_link(), do: Registry.start_link(keys: :duplicate, name: __MODULE__)
 
     def subscribe(subscriber_key), do: Registry.register(__MODULE__, subscriber_key, nil)
 
@@ -19,11 +19,12 @@ defmodule TestSite do
     @moduledoc false
     use Phoenix.Endpoint, otp_app: :phoenix_gen_socket_client
 
-    socket("/test_socket", TestSite.Socket)
-    socket("/test_socket_updated", TestSite.SocketUpdated)
+    socket("/test_socket", TestSite.Socket, websocket: true, longpoll: false)
+    socket("/test_socket_updated", TestSite.SocketUpdated, websocket: true, longpoll: false)
 
     @doc false
     def init(:supervisor, config) do
+      IO.inspect(:ets.all |> Enum.filter(fn x -> is_atom(x) end))
       {:ok,
        Keyword.merge(
          config,
@@ -41,8 +42,6 @@ defmodule TestSite do
     @moduledoc false
     use Phoenix.Socket
 
-    transport(:websocket, Phoenix.Transports.WebSocket)
-
     # List of exposed channels
     channel("channel:*", TestSite.Channel)
 
@@ -59,8 +58,6 @@ defmodule TestSite do
   defmodule SocketUpdated do
     @moduledoc false
     use Phoenix.Socket
-
-    transport(:websocket, Phoenix.Transports.WebSocket)
 
     # List of exposed channels
     channel("channel:*", TestSite.Channel)
