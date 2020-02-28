@@ -22,11 +22,11 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
   # -------------------------------------------------------------------
 
   @doc false
-  def decode_message(encoded_message), do: Poison.decode!(encoded_message)
+  def decode_message(encoded_message), do: Jason.decode!(encoded_message)
 
   @doc false
   def encode_message(message) do
-    case Poison.encode(message) do
+    case Jason.encode(message) do
       {:ok, encoded} -> {:ok, {:binary, encoded}}
       error -> error
     end
@@ -45,12 +45,12 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.GzipJson do
   def decode_message(encoded_message) do
     encoded_message
     |> :zlib.gunzip()
-    |> Poison.decode!()
+    |> Jason.decode!()
   end
 
   @doc false
   def encode_message(message) do
-    case Poison.encode_to_iodata(message) do
+    case Jason.encode_to_iodata(message) do
       {:ok, encoded} -> {:ok, {:binary, :zlib.gzip(encoded)}}
       error -> error
     end
