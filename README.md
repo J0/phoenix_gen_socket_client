@@ -32,14 +32,14 @@ def project do
 end
 ```
 
-You also need to add the transport (e.g. a websocket client), and serializer (e.g. JSON) as dependencies. Out of the box, the adapter for [sanmiguel/websocket_client](https://github.com/sanmiguel/websocket_client), and support for [devinus/poison](https://github.com/devinus/poison) is provided but you still need to include the libraries yourself:
+You also need to add the transport (e.g. a websocket client), and serializer (e.g. JSON) as dependencies. Out of the box, the adapter for [sanmiguel/websocket_client](https://github.com/sanmiguel/websocket_client), and support for [Jason](https://hex.pm/packages/jason) is provided but you still need to include the libraries yourself:
 
 ```elixir
 def project do
   [
     deps: [
       {:websocket_client, "~> 1.2"},
-      {:poison, "~> 2.0"}
+      {:jason, "~> 1.1"}
 
       # ...
     ],

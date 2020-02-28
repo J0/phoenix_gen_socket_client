@@ -9,7 +9,7 @@ defmodule Example.Mixfile do
      compilers: [:phoenix, :gettext] ++ Mix.compilers,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application.
@@ -37,7 +37,8 @@ defmodule Example.Mixfile do
       # Note: we're using a local dependency here to keep this project in sync with the repo state.
       # In regular production you should use the latest published hex version.
       {:phoenix_gen_socket_client, path: "../"},
-      {:websocket_client, "~> 1.2"}
+      {:websocket_client, "~> 1.2"},
+      {:jason, "~> 1.1"}
     ]
   end
 end
