@@ -8,6 +8,14 @@ matrix:
       elixir: 1.6
       env:
         - CHECK_FORMAT=true
+    - otp_release: 21.1
+      elixir: 1.7.3
+      env:
+        - CHECK_FORMAT=true
+    - otp_release: 22.2.8
+      elixir: 1.9.2
+      env:
+        - CHECK_FORMAT=true
 env:
   global:
     - MIX_HOME=$(pwd)/.mix
