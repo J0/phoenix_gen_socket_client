@@ -1,3 +1,9 @@
+## 3.0.0
+
+- The provided Json serializer uses Jason rather than Poison. This is a breaking change and the cause of the major version bump.
+- Minor fixes to doc and tests
+- Tests against more recent Elixir (1.10) and Erlang (22) versions
+
 ## 2.1.1
 
 - Uses credo only in `:dev` and `:test`, so it's not treated as a transitive dependency in client projects.
