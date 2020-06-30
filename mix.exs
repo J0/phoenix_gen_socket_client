@@ -40,7 +40,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
       {:cowboy, "~> 1.0", only: :test},
       {:credo, "~> 0.8.10", only: [:dev, :test], runtime: false},
       {:dialyze, "~> 0.2.1", only: :dev},
-      {:ex_doc, "~> 0.17.1", only: :docs}
+      {:ex_doc, "~> 0.22.1", only: :docs}
     ]
   end
 
