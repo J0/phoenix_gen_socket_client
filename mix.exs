@@ -1,14 +1,14 @@
 defmodule Phoenix.GenSocketClient.Mixfile do
   use Mix.Project
 
-  @version "2.1.1"
+  @version "3.0.0"
   @github_url "https://github.com/Aircloak/phoenix_gen_socket_client"
 
   def project do
     [
       app: :phoenix_gen_socket_client,
       version: @version,
-      elixir: "~> 1.5",
+      elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
