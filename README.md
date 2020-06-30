@@ -24,7 +24,7 @@ You need to add the project as a dependency to your `mix.exs`:
 def project do
   [
     deps: [
-      {:phoenix_gen_socket_client, "~> 2.1.1"}
+      {:phoenix_gen_socket_client, "~> 3.0.0"}
       # ...
     ],
     # ...
@@ -128,6 +128,6 @@ If the server sends an asynchronous message (i.e. not a direct reply), the `hand
 
 ## Copyright and License
 
-Copyright (c) 2016 Aircloak
+Copyright (c) 2020 Aircloak
 
 The source code is licensed under the [MIT License](./LICENSE.md).
