@@ -26,7 +26,7 @@ before_script:
   - mix compile --warnings-as-errors
   - MIX_ENV=test mix compile --warnings-as-errors
 script:
-  - MIX_ENV=docs mix docs
+  - mix docs
   - mix credo --strict
   - MIX_ENV=test mix credo --strict
   - mix test
