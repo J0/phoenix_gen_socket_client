@@ -156,7 +156,7 @@ defmodule Phoenix.Channels.GenSocketClient do
   end
 
   @doc "Makes a synchronous call to the server and waits for its reply."
-  @spec call(GenServer.server(), any, non_neg_integer) :: any
+  @spec call(GenServer.server(), any, timeout) :: any
   def call(server, request, timeout \\ 5000),
     do: GenServer.call(server, {__MODULE__, :call, request}, timeout)
 
