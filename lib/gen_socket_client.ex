@@ -139,6 +139,12 @@ defmodule Phoenix.Channels.GenSocketClient do
               | {:stop, reason, new_state}
             when new_state: callback_state, reply: term, reason: term
 
+  @doc "Optional callback invoked when the server is about to exit. It should do any cleanup required."
+  @callback terminate(reason, state :: term()) :: term()
+            when reason: :normal | :shutdown | {:shutdown, term()}
+
+  @optional_callbacks terminate: 2
+
   # -------------------------------------------------------------------
   # API functions
   # -------------------------------------------------------------------
@@ -303,6 +309,12 @@ defmodule Phoenix.Channels.GenSocketClient do
 
   def handle_info(message, state) do
     invoke_callback(state, :handle_info, [message, transport(state)])
+  end
+
+  def terminate(reason, state) do
+    if function_exported?(state.callback, :terminate, 2) do
+      state.callback.terminate(reason, state)
+    end
   end
 
   # -------------------------------------------------------------------

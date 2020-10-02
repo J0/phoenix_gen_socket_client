@@ -33,6 +33,7 @@ defmodule Example.SocketClient do
 
     if state.first_join do
       :timer.send_interval(:timer.seconds(1), self(), :ping_server)
+      :timer.send_interval(:timer.seconds(5), self(), :maybe_stop)
       {:ok, %{state | first_join: false, ping_ref: 1}}
     else
       {:ok, %{state | ping_ref: 1}}
@@ -84,8 +85,20 @@ defmodule Example.SocketClient do
     GenSocketClient.push(transport, "ping", "ping", %{ping_ref: state.ping_ref})
     {:ok, %{state | ping_ref: state.ping_ref + 1}}
   end
+  def handle_info(:maybe_stop, _transport, state) do
+    if :rand.uniform(5) == 1 do
+      Logger.warn("stopping the socket client")
+      {:stop, :normal, state}
+    else
+      {:ok, state}
+    end
+  end
   def handle_info(message, _transport, state) do
     Logger.warn("Unhandled message #{inspect message}")
     {:ok, state}
+  end
+
+  def terminate(reason, _state) do
+    Logger.info("Terminating and cleaning up state. Reason for termination: #{reason}")
   end
 end
