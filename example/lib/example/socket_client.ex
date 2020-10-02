@@ -106,6 +106,11 @@ defmodule Example.SocketClient do
     {:ok, state}
   end
 
+  def handle_call(message, _from, _transport, state) do
+    Logger.warn("Did not expect to receive call with message: #{inspect message}")
+    {:reply, {:error, :unexpected_message}, state}
+  end
+
   def terminate(reason, _state) do
     Logger.info("Terminating and cleaning up state. Reason for termination: #{reason}")
   end
