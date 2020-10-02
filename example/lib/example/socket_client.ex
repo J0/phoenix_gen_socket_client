@@ -6,10 +6,10 @@ defmodule Example.SocketClient do
 
   def start_link() do
     GenSocketClient.start_link(
-          __MODULE__,
-          Phoenix.Channels.GenSocketClient.Transport.WebSocketClient,
-          "ws://localhost:4000/socket/websocket"
-        )
+      __MODULE__,
+      Phoenix.Channels.GenSocketClient.Transport.WebSocketClient,
+      "ws://localhost:4000/socket/websocket"
+    )
   end
 
   def init(url) do
@@ -23,7 +23,7 @@ defmodule Example.SocketClient do
   end
 
   def handle_disconnected(reason, state) do
-    Logger.error("disconnected: #{inspect reason}")
+    Logger.error("disconnected: #{inspect(reason)}")
     Process.send_after(self(), :connect, :timer.seconds(1))
     {:ok, state}
   end
@@ -33,6 +33,7 @@ defmodule Example.SocketClient do
 
     if state.first_join do
       :timer.send_interval(:timer.seconds(1), self(), :ping_server)
+      :timer.send_interval(:timer.seconds(5), self(), :maybe_stop)
       {:ok, %{state | first_join: false, ping_ref: 1}}
     else
       {:ok, %{state | ping_ref: 1}}
@@ -40,18 +41,18 @@ defmodule Example.SocketClient do
   end
 
   def handle_join_error(topic, payload, _transport, state) do
-    Logger.error("join error on the topic #{topic}: #{inspect payload}")
+    Logger.error("join error on the topic #{topic}: #{inspect(payload)}")
     {:ok, state}
   end
 
   def handle_channel_closed(topic, payload, _transport, state) do
-    Logger.error("disconnected from the topic #{topic}: #{inspect payload}")
+    Logger.error("disconnected from the topic #{topic}: #{inspect(payload)}")
     Process.send_after(self(), {:join, topic}, :timer.seconds(1))
     {:ok, state}
   end
 
   def handle_message(topic, event, payload, _transport, state) do
-    Logger.warn("message on topic #{topic}: #{event} #{inspect payload}")
+    Logger.warn("message on topic #{topic}: #{event} #{inspect(payload)}")
     {:ok, state}
   end
 
@@ -59,8 +60,9 @@ defmodule Example.SocketClient do
     Logger.info("server pong ##{payload["response"]["ping_ref"]}")
     {:ok, state}
   end
+
   def handle_reply(topic, _ref, payload, _transport, state) do
-    Logger.warn("reply on topic #{topic}: #{inspect payload}")
+    Logger.warn("reply on topic #{topic}: #{inspect(payload)}")
     {:ok, state}
   end
 
@@ -68,24 +70,48 @@ defmodule Example.SocketClient do
     Logger.info("connecting")
     {:connect, state}
   end
+
   def handle_info({:join, topic}, transport, state) do
     Logger.info("joining the topic #{topic}")
+
     case GenSocketClient.join(transport, topic) do
       {:error, reason} ->
-        Logger.error("error joining the topic #{topic}: #{inspect reason}")
+        Logger.error("error joining the topic #{topic}: #{inspect(reason)}")
         Process.send_after(self(), {:join, topic}, :timer.seconds(1))
-      {:ok, _ref} -> :ok
+
+      {:ok, _ref} ->
+        :ok
     end
 
     {:ok, state}
   end
+
   def handle_info(:ping_server, transport, state) do
     Logger.info("sending ping ##{state.ping_ref}")
     GenSocketClient.push(transport, "ping", "ping", %{ping_ref: state.ping_ref})
     {:ok, %{state | ping_ref: state.ping_ref + 1}}
   end
+
+  def handle_info(:maybe_stop, _transport, state) do
+    if :rand.uniform(5) == 1 do
+      Logger.warn("stopping the socket client")
+      {:stop, :normal, state}
+    else
+      {:ok, state}
+    end
+  end
+
   def handle_info(message, _transport, state) do
-    Logger.warn("Unhandled message #{inspect message}")
+    Logger.warn("Unhandled message #{inspect(message)}")
     {:ok, state}
+  end
+
+  def handle_call(message, _from, _transport, state) do
+    Logger.warn("Did not expect to receive call with message: #{inspect message}")
+    {:reply, {:error, :unexpected_message}, state}
+  end
+
+  def terminate(reason, _state) do
+    Logger.info("Terminating and cleaning up state. Reason for termination: #{reason}")
   end
 end
