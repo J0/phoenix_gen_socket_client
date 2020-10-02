@@ -1,3 +1,8 @@
+## 3.1.0
+
+- Fix timeout typespec in GenSocketClient call function. Thanks @matt-mazzucato
+- Add support for optional terminate callback
+
 ## 3.0.0
 
 - The provided Json serializer uses Jason rather than Poison. This is a breaking change and the cause of the major version bump.
