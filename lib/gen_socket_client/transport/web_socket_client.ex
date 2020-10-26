@@ -10,9 +10,12 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
       which is less than the server timeout, you can ensure that the connection remains open, even if  no
       messages are being passed between the client and the server. If you don't want to disable this mechanism,
       you can pass `nil`. If this option is not provided, the default value of 30 seconds is used.
+    - `extra_headers` - List of headers to send in the handshake. It will be forwarded as is to the underlying library.
+    - `ssl_verify` - It will be forwarded as is to the underlying library.
   """
   @behaviour Phoenix.Channels.GenSocketClient.Transport
   @behaviour :websocket_client
+  @websocket_client_opts [:extra_headers, :ssl_verify]
 
   require Logger
   require Record
@@ -24,9 +27,11 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
 
   @doc false
   def start_link(url, transport_options) do
+    {ws_opts, transport_options} = Keyword.split(transport_options, @websocket_client_opts)
+
     url
     |> to_charlist()
-    |> :websocket_client.start_link(__MODULE__, [self(), transport_options])
+    |> :websocket_client.start_link(__MODULE__, [self(), transport_options], ws_opts)
   end
 
   @doc false
