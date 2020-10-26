@@ -1,3 +1,7 @@
+## 3.2.0
+
+- Allow passing `:extra_headers` and `:ssl_verify` options to websocket_client. Thanks @albertored
+
 ## 3.1.0
 
 - Fix timeout typespec in GenSocketClient call function. Thanks @matt-mazzucato
