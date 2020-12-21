@@ -27,7 +27,7 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
   @doc false
   def encode_message(message) do
     case Jason.encode(message) do
-      {:ok, encoded} -> {:ok, {:binary, encoded}}
+      {:ok, encoded} -> {:ok, {:text, encoded}}
       error -> error
     end
   end
