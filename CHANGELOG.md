@@ -1,3 +1,7 @@
+## 3.2.1
+
+- Fixed text encoding bug when upgrading Phoenix to 1.5.7 (issue #54). Thanks @vladra
+
 ## 3.2.0
 
 - Allow passing `:extra_headers` and `:ssl_verify` options to websocket_client. Thanks @albertored
