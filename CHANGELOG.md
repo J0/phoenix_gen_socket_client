@@ -1,3 +1,13 @@
+## 3.2.2
+
+This library has been retired.
+It is no longer maintained.
+It will not receive security fixes or updates.
+
+For more information, please read this issue:
+https://github.com/Aircloak/phoenix_gen_socket_client/issues/57
+
+
 ## 3.2.1
 
 - Fixed text encoding bug when upgrading Phoenix to 1.5.7 (issue #54). Thanks @vladra
