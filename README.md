@@ -1,16 +1,3 @@
-# No longer maintained!
-
-This package is no longer maintained.
-Please [read this issue for additional information](https://github.com/Aircloak/phoenix_gen_socket_client/issues/57).
-
-If you are starting a new project, __please do not add this package to your dependencies__.
-__No updates or security fixes can be guaranteed__.
-
-If you are interested in taking over the ownership of the `phoenix_gen_socket_client` library,
-please let us know.
-
-You can find the original README below.
-
 # phoenix_gen_socket_client
 
 [![Build
