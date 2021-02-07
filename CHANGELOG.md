@@ -1,3 +1,7 @@
+## 4.0.0
+- Allow passing options to serializer for decoding based on the opcode (`:text` or `:binary`). Thanks @cabol
+
+
 ## 3.2.2
 
 This library has been retired.
