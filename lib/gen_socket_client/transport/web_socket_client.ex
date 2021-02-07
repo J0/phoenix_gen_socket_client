@@ -64,7 +64,7 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   def websocket_handle({:pong, _message}, _req, state), do: {:ok, state}
 
   def websocket_handle({type, message}, _req, state) when type in [:text, :binary] do
-    GenSocketClient.notify_message(state.socket, message)
+    GenSocketClient.notify_message(state.socket, {type, message})
     {:ok, state}
   end
 

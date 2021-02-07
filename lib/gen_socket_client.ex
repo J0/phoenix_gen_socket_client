@@ -228,7 +228,7 @@ defmodule Phoenix.Channels.GenSocketClient do
     do: GenServer.cast(socket, {:notify_disconnected, reason})
 
   @doc "Forwards a received message to the socket process."
-  @spec notify_message(GenServer.server(), binary) :: :ok
+  @spec notify_message(GenServer.server(), {:text | :binary, binary}) :: :ok
   def notify_message(socket, message), do: GenServer.cast(socket, {:notify_message, message})
 
   # -------------------------------------------------------------------
@@ -271,8 +271,8 @@ defmodule Phoenix.Channels.GenSocketClient do
     invoke_callback(reinit(state), :handle_disconnected, [reason])
   end
 
-  def handle_cast({:notify_message, encoded_message}, state) do
-    decoded_message = state.serializer.decode_message(encoded_message)
+  def handle_cast({:notify_message, {opcode, encoded_message}}, state) do
+    decoded_message = state.serializer.decode_message(encoded_message, opcode: opcode)
     handle_message(decoded_message, state)
   end
 

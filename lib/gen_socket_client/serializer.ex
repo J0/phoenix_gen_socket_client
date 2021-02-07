@@ -6,7 +6,8 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer do
   alias Phoenix.Channels.GenSocketClient
 
   @doc "Invoked to decode the raw message."
-  @callback decode_message(GenSocketClient.encoded_message()) :: GenSocketClient.message()
+  @callback decode_message(GenSocketClient.encoded_message(), Keyword.t()) ::
+              GenSocketClient.message()
 
   @doc "Invoked to encode a socket message."
   @callback encode_message(GenSocketClient.message()) ::
@@ -22,7 +23,7 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.Json do
   # -------------------------------------------------------------------
 
   @doc false
-  def decode_message(encoded_message), do: Jason.decode!(encoded_message)
+  def decode_message(encoded_message, _opts), do: Jason.decode!(encoded_message)
 
   @doc false
   def encode_message(message) do
@@ -42,7 +43,7 @@ defmodule Phoenix.Channels.GenSocketClient.Serializer.GzipJson do
   # -------------------------------------------------------------------
 
   @doc false
-  def decode_message(encoded_message) do
+  def decode_message(encoded_message, _opts) do
     encoded_message
     |> :zlib.gunzip()
     |> Jason.decode!()
