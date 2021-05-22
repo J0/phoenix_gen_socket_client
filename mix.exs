@@ -2,7 +2,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
   use Mix.Project
 
   @version "4.0.0"
-  @github_url "https://github.com/Aircloak/phoenix_gen_socket_client"
+  @github_url "https://github.com/J0/phoenix_gen_socket_client"
 
   def project do
     [
@@ -48,7 +48,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
 
   defp package do
     [
-      maintainers: ["Aircloak"],
+      maintainers: ["J0"],
       licenses: ["MIT"],
       links: %{
         "GitHub" => @github_url,
