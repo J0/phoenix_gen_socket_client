@@ -1,3 +1,6 @@
+## 4.1.0
+- Allow passing socket_opts to the underlying websocket client. This is required to pass additional ssl options to the socket, which might be useful in some cases. Thanks @matt-mazzucato
+
 ## 4.0.0
 - Allow passing options to serializer for decoding based on the opcode (`:text` or `:binary`). Thanks @cabol
 
