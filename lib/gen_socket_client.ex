@@ -403,8 +403,10 @@ defmodule Phoenix.Channels.GenSocketClient do
   defp transport(state), do: Map.take(state, [:transport_mod, :transport_pid, :serializer])
 
   defp next_ref(event, topic) do
-    ref = Process.get({__MODULE__, :ref}, 0) + 1
-    Process.put({__MODULE__, :ref}, ref)
+    ref_counter = Process.get({__MODULE__, :ref}, 0) + 1
+    Process.put({__MODULE__, :ref}, ref_counter)
+
+    ref = to_string(ref_counter)
 
     join_ref = if event == "phx_join", do: ref, else: join_ref(topic)
 
