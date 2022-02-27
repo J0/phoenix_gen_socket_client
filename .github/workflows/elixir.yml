@@ -34,6 +34,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
       - name: Install dependencies
         run: |
+          echo $MIX_HOME
           mkdir -p $MIX_HOME
           mix local.hex --force
           mix local.rebar --force
