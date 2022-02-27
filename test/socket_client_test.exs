@@ -79,6 +79,12 @@ defmodule Phoenix.Channels.GenSocketClientTest do
     assert_receive {TestSite.Channel, {:terminate, {:shutdown, :left}}}
   end
 
+  test "push references are strings" do
+    conn = join_channel()
+    {:ok, ref} = TestSocket.push(conn.socket, "channel:1", "event")
+    assert is_binary(ref)
+  end
+
   test "push references are monotonically increasing on the same channel" do
     conn = join_channel()
     {:ok, ref1} = TestSocket.push(conn.socket, "channel:1", "event1")

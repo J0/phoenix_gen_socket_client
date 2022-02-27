@@ -15,7 +15,7 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
   """
   @behaviour Phoenix.Channels.GenSocketClient.Transport
   @behaviour :websocket_client
-  @websocket_client_opts [:extra_headers, :ssl_verify]
+  @websocket_client_opts [:extra_headers, :ssl_verify, :socket_opts]
 
   require Logger
   require Record
