@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ["22.0", "23.0", "24.0"]
+        otp: ["22.0", "23.0"]
         elixir: ["1.8.2", "1.10.3"]
     env:
       MIX_ENV: test
@@ -31,6 +31,7 @@ jobs:
           path: |
             deps
             _build
+          key: ${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
       - name: Install dependencies
         run: mix deps.get
       - name: Compile
@@ -40,6 +41,10 @@ jobs:
   mix-format:
     name: Mix-Format and Credo tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: ["22.0", "23.0"]
+        elixir: ["1.8.2", "1.10.3"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Elixir
