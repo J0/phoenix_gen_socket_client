@@ -33,9 +33,14 @@ jobs:
             _build
           key: ${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
       - name: Install dependencies
-        run: mix deps.get
+        run: |
+        mkdir -p $MIX_HOME
+        mix local.hex --force
+        mix local.rebar --force   
       - name: Compile
-        run: mix compile --warnings-as-errors
+        run: |
+        mix deps.get
+        mix compile --warnings-as-errors
       - name: Run tests
         run: mix test
   mix-format:
@@ -58,6 +63,7 @@ jobs:
           path: |
             deps
             _build
+          key: ${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
       - name: Install dependencies
         run: |
           mix deps.get
@@ -66,4 +72,6 @@ jobs:
       - name: Credo checks
         run: mix credo --strict
       - name: Dialyzer checks
-        run: mix dialyze
+        run: |
+        mix dialyze
+        mix docs
