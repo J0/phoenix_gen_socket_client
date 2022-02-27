@@ -2,9 +2,9 @@ name: Elixir CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ["22.0", "23.0"]
+        otp: ["22.0", "23.0", "24.0"]
         elixir: ["1.8.2", "1.10.3"]
     env:
       MIX_ENV: test
