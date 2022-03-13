@@ -26,6 +26,7 @@ jobs:
         with:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
+          rebar3-version: ${{matrix.rebar3}}
       - name: Restore dependencies cache
         uses: actions/cache@v2
         with:
