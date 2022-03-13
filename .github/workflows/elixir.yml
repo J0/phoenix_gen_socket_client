@@ -14,12 +14,10 @@ jobs:
       matrix:
         otp: ["22.0", "23.0"]
         elixir: ["1.8.2", "1.10.3"]
-        rebar3: ["3.14.1"]
+        rebar3: ["3.15.2"]
     env:
       MIX_ENV: test
-      MIX_HOME: ".mix"
       CHECK_FORMAT: true
-      INSTALL_DIR_FOR_REBAR3: ".mix"
     steps:
       - uses: actions/checkout@v2
       - name: Set up Elixir
