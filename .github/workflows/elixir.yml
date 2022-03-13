@@ -1,0 +1,72 @@
+name: Elixir CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: ["22.0", "23.0"]
+        elixir: ["1.8.2", "1.10.3"]
+        rebar3: ["3.15.2"]
+    env:
+      MIX_ENV: test
+      CHECK_FORMAT: true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+          rebar3-version: ${{matrix.rebar3}}
+      - name: Restore dependencies cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
+      - name: Get deps
+        run: mix deps.get
+      - name: Compile
+        run: mix compile --warnings-as-errors
+      - name: Run tests
+        run: mix test
+  mix-format:
+    name: Mix-Format and Credo tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: ["22.0"]
+        elixir: ["1.8.2", "1.10.3"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - name: Restore dependencies cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Run format check
+        run: mix format --check-formatted
+      - name: Credo checks
+        run: mix credo --strict
+      - name: Dialyzer checks
+        run: mix dialyze
+      - name: Run docs
+        run: mix docs

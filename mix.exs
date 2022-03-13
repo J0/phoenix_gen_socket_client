@@ -1,7 +1,7 @@
 defmodule Phoenix.GenSocketClient.Mixfile do
   use Mix.Project
 
-  @version "4.0.0"
+  @version "4.1.0"
   @github_url "https://github.com/J0/phoenix_gen_socket_client"
 
   def project do
