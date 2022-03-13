@@ -19,6 +19,7 @@ jobs:
       MIX_ENV: test
       MIX_HOME: ".mix"
       CHECK_FORMAT: true
+      INSTALL_DIR_FOR_REBAR3: ".mix"
     steps:
       - uses: actions/checkout@v2
       - name: Set up Elixir
@@ -34,12 +35,6 @@ jobs:
             deps
             _build
           key: ${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
-      - name: Install dependencies
-        run: |
-          echo $MIX_HOME
-          mkdir -p $MIX_HOME
-          mix local.hex --force
-          mix local.rebar --force
       - name: Get deps
         run: mix deps.get
       - name: Compile
