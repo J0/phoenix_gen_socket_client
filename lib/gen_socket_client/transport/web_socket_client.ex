@@ -75,6 +75,17 @@ defmodule Phoenix.Channels.GenSocketClient.Transport.WebSocketClient do
 
   @doc false
   def websocket_info({:send_frame, frame}, _req, state), do: {:reply, frame, state}
+
+  def websocket_info({:tcp_closed, _pid}, _req, state) do
+    GenSocketClient.notify_disconnected(state.socket, {:remote, :closed})
+    {:close, "", state}
+  end
+
+  def websocket_info({:ssl_closed, _ssl_socket}, _req, state) do
+    GenSocketClient.notify_disconnected(state.socket, {:remote, :closed})
+    {:close, "", state}
+  end
+
   def websocket_info(_message, _req, state), do: {:ok, state}
 
   @doc false
