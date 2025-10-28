@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ["27.0", "28.0"]
+        otp: ["25.1"]
         elixir: ["1.18.4", "1.19.1"]
         rebar3: ["3.25.1"]
     env:
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ["27.0", "28.0"]
+        otp: ["25.1"]
         elixir: ["1.18.4", "1.19.1"]
     steps:
       - uses: actions/checkout@v2

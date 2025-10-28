@@ -35,8 +35,7 @@ defmodule Phoenix.GenSocketClient.Mixfile do
     [
       {:websocket_client, "~> 1.2", optional: true},
       {:jason, "~> 1.1", optional: true},
-      {:phoenix, "~> 1.3", only: :test},
-      {:cowboy, "~> 1.0", only: :test},
+      {:phoenix, "~> 1.5", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyze, "~> 0.2.1", only: :dev},
       {:ex_doc, "~> 0.22.1", only: :dev, runtime: false}
