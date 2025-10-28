@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         otp: ["25.1"]
-        elixir: ["1.18.4", "1.19.1"]
+        elixir: ["1.14.5"]
         rebar3: ["3.25.1"]
     env:
       MIX_ENV: test
@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix:
         otp: ["25.1"]
-        elixir: ["1.18.4", "1.19.1"]
+        elixir: ["1.14.5"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Elixir
