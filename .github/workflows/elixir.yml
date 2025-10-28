@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ["22.0", "23.0"]
-        elixir: ["1.8.2", "1.10.3"]
+        otp: ["27.0", "28.0"]
+        elixir: ["1.18.4", "1.19.1"]
         rebar3: ["3.15.2"]
     env:
       MIX_ENV: test
       CHECK_FORMAT: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
@@ -44,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: ["22.0"]
-        elixir: ["1.8.2", "1.10.3"]
+        otp: ["27.0", "28.0"]
+        elixir: ["1.18.4", "1.19.1"]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Elixir
@@ -54,7 +54,7 @@ jobs:
           otp-version: ${{matrix.otp}}
           elixir-version: ${{matrix.elixir}}
       - name: Restore dependencies cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             deps
